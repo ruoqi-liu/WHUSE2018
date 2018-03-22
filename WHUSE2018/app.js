@@ -38,8 +38,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.listen(3000, function () {
-    console.log("WHUSE is listening at 3000. \n");
+app.listen(3001, function () {
+    console.log("WHUSE is listening at 3001. \n");
 });
 
 module.exports = app;
