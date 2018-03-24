@@ -4,12 +4,12 @@ var router = express.Router();
 var verifyRounter = require('./Verify/verify');
 var monk = require('monk');
 var db = monk('localhost:27017/WHUSE');
-var colloction = db.get('user');
+var collection = db.get('user');
 
 router.use('/verify', verifyRounter);
 
 router.get('/', function (req, res, next) {//select
-    colloction.find({ name: req.headers.name, password: req.headers.password }, function (err, result) {
+    collection.find({ name: req.headers.name, password: req.headers.password }, function (err, result) {
         if (err) throw err;
         if (result)
             if (result.length == 1) {
@@ -23,7 +23,7 @@ router.get('/', function (req, res, next) {//select
 );
 
 router.post('/', function (req, res, next) {//add
-    colloction.insert({ name: req.body.name, password: req.body.password }, function (err, result) {
+    collection.insert({ name: req.body.name, password: req.body.password }, function (err, result) {
         if (err)
             if (err.code == 11000)
                 res.send({ 'succeed': '0', 'error': 'duplicated name' });
@@ -38,7 +38,7 @@ router.post('/', function (req, res, next) {//add
 });
 
 router.put('/', function (req, res, next) {//update
-    colloction.update({ name: req.body.name, password: req.body.password }, JSON.parse(req.body.content), function (err, result) {
+    collection.update({ name: req.body.name, password: req.body.password }, JSON.parse(req.body.content), function (err, result) {
         console.log(result);
         if (err)
             if (err.code == 11000)
@@ -56,7 +56,7 @@ router.put('/', function (req, res, next) {//update
 });
 
 router.delete('/', function (req, res, next) {//delete
-    colloction.remove({ name: req.body.name, password: req.body.password }, function (err, result) {
+    collection.remove({ name: req.body.name, password: req.body.password }, function (err, result) {
         if (err) {
             res.send({ succeed: '0', error: 'unknown' });
             return;
