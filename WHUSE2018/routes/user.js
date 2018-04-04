@@ -11,25 +11,14 @@ var monk = require('monk');
 var db = monk('localhost:27017/WHUSE');
 var collection = db.get('user');
 
-router.use(session({
-    resave: true,
-    saveUninitialized: true,
-    secret: 'meow',
-    rolling: true,
-    cookie: { maxAge: 60000000 }
-}
-)
-);
-
-router.use(passport.initialize());
-router.use(passport.session());
-router.use(flash());
+//router.use(passport.initialize());
+//router.use(passport.session());
+//router.use(flash());
 
 router.post('/login', function (req, res, next) {
     passport.authenticate('logIn',
         function (err, user, info) {//user and info are passed by the PassportChain not in the session
             if (err) return next(err);
-            console.log(req.session);
             if (!user) {
                 req.flash('error', { msg: info.message });
                 req.logout();
@@ -40,7 +29,7 @@ router.post('/login', function (req, res, next) {
                 req.logIn(user, function (err) {
 
                     if (err) return next(err);
-                    res.send({ 'islogin': '1', 'username': user.username });
+                    res.send({ 'islogin': '1', 'username': user.username,'photo':user.photo });
                 });
             return;
         })(req, res, next);
@@ -64,7 +53,6 @@ router.post('/login', function (req, res, next) {
 router.post('/register', function (req, res, next) {//add
     passport.authenticate('signUp', function (err, user, info) {
         if (err) next(err);
-
         if (!user) {
             req.flash('error', { msg: info.message });
             req.logout();
@@ -75,7 +63,7 @@ router.post('/register', function (req, res, next) {//add
             req.logIn(user, function (err) {
 
                 if (err) return next(err);
-                res.send({ 'isregister': '1', 'username': user.username });
+                res.send({ 'isregister': '1', 'username': user.username,'photo':user.photo});
             });
         return;
     })(req, res, next);
@@ -95,18 +83,19 @@ router.post('/register', function (req, res, next) {//add
 //return;
 
 router.put('/:name', isAuthentic, function (req, res, next) {//update
-    if (!req.body.content) return;
-    console.log(req.params.name);
-    collection.update({ name: req.params.name, password: req.body.password }, req.body.content, function (err, result) {
+    if (!req.body.content) return res.send({ 'isupdate': '0', 'message': 'content null'});
+    var content = req.body.content;
+    collection.update({ name: req.params.name, password: req.body.password }, {
+        $set: {'name':content.name,'password':content.password}} , function (err, result) {
         if (err)
             if (err.code == 11000)
                 res.send({ 'isupdate': '0', 'message': 'duplicated name' });
             else
                 res.send({ 'isupdate': '0', 'message': 'unkonwn' });
-        else if (result.n > 0)
+        else if (result.length > 0)
             res.send({ 'isupdate': '1' });
         else
-            res.send({ 'isupdate': '0', 'message': 'invalid password' });
+            res.send({ 'isupdate': '0', 'message': 'invalid password' });// 前端需要判断，新密码不能与原密码相同
         return;
     }
     );

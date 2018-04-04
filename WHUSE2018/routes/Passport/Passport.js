@@ -25,12 +25,14 @@ passport.use('logIn', new LocalStrategy(
     }, function (username, password, done) {//设置为true之后第一个参数会将req传入    
         if (!username || !password)
             done(null, false, { 'valid': '0', message: 'username or password cannot be null.' });
-        collection.find({ name: username, password: password }, { fields: { name: 1, password: 1,image: 1 } }, function (err, result) {
+        collection.find({ name: username, password: password }, { fields: { name: 1, password: 1 , userinfo: 1 } }, function (err, result) {
             if (err) throw err;
-            console.log(result);
+            
             if (result)
                 if (result.length == 1) {
-                    return done(null, { 'username': username,'photo':result.image ,'valid': '1' });
+                    result = result[0];
+                    if (!result.userinfo.photo) result.userinfo.photo = '/images/0001.jpg';
+                    return done(null, { 'username': username, 'photo': result.userinfo.photo,'valid': '1' });
                 }
                 else
                     return done(null, false, { 'valid': '0', message: 'username or password incorrect.' });
@@ -47,14 +49,15 @@ passport.use('signUp', new LocalStrategy(
     }, function (req, username, password, done) {
         if (!username || !password)
             done(null, false, { 'valid': '0', message: 'username or password cannot be null.' });
-        collection.insert({ name: username, password: password }, function (err, result) {
+        collection.insert({
+            name: username, password: password, userinfo: { photo:'/images/0001.jpg'}}, function (err, result) {
             if (err)
                 if (err.code == 11000)
                     return done(null, false, { message: 'duplicated username', 'valid': '0' });
                 else
                     return done(null, false, { message: 'unknown error', 'valid': '0' });
             else
-                return done(null, { 'username': username, 'photo': result.image, valid: '1' });
+                return done(null, { 'username': username, 'photo': result.userinfo.photo, valid: '1' });
 
             return;
         });

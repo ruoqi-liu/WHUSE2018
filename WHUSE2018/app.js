@@ -5,10 +5,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+var passport = require('./routes/Passport/Passport').passport;
+var session = require('express-session');
+var flash = require('connect-flash');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var userInfoRouter = require('./routes/user');
+var userRouter = require('./routes/user');
+var userInfoRouter = require('./routes/userinfo');
 
 var app = express();
 
@@ -19,11 +22,27 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser('meow'));
+app.use(session({
+    resave: true,
+    saveUninitialized: true,
+    secret: 'meow',
+    rolling: true,
+    cookie: { maxAge: 60000000 }
+}
+)
+);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/user',userInfoRouter);
+app.use('/user', userRouter);
+app.use('/userinfo',userInfoRouter);
+
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
