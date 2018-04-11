@@ -4,17 +4,16 @@ var flash = require('connect-flash');
 var router = express.Router();
 var passport = require('./Passport/Passport').passport;
 var isAuthentic = require('./Passport/Passport').authentic;
+var userNameVerify = require('./Passport/Passport').userNameVerify;
 var logout = require('./Passport/Passport').logout;
 var monk = require('monk');
 var db = monk('localhost:27017/WHUSE');
 var collection = db.get('user');
 
 
-router.get('/:name', isAuthentic,function (req, res, next) {
+router.get('/:name', isAuthentic,userNameVerify,function (req, res, next) {
     var name = req.params.name;
-    var user = req.session.passport.user;
     console.log(req.session);
-    if (name != user.name) return res.send({ 'isuserinfo': '0', 'message': 'incorrespond name' });
 
     collection.find({ 'name': name }, { fields: { name: 1, userinfo: 1 } }, function (err, result) {
         if (err) throw err;
@@ -28,10 +27,9 @@ router.get('/:name', isAuthentic,function (req, res, next) {
     });
 });
 
-router.put('/:name', isAuthentic, function (req, res, next) {
+router.put('/:name', isAuthentic,userNameVerify, function (req, res, next) {
     var name = req.params.name;
-    var user = req.session.passport.user;
-    if (name != user.name) return res.send({ 'updateuserinfo': '0', 'message': 'incorrespond name' });
+
     if (!req.body.content) return res.send({ 'updateuserinfo': '0', 'message': 'content null' });
     var content = req.body.content;
     if (!content.photo) content.photo = '/images/0001.jpg';

@@ -79,6 +79,14 @@ var userLogout = function (req, res, next) {
     return;
 }
 
+var userNameVerify = function (req, res, next) {
+    var user = req.session.passport.user;
+    var name = req.params.name;
+    if (name != user.name) return res.send({ 'tologin': '1','message':'incorrespond username' });
+    return next();
+}
+
+exports.userNameVerify = userNameVerify;
 exports.authentic = isAuthenticated;
 exports.passport = passport;
 exports.logout = userLogout;
