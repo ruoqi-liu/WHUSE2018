@@ -20,10 +20,10 @@ router.get('/:name', isAuthentic,userNameVerify,function (req, res, next) {
 
         if (result.length == 1) {
             result = result[0];
-            return res.send({ 'isuserinfo': '1', userinfo: result.userinfo });
+            return res.send({ 'getuserinfo': '1', userinfo: result.userinfo });
         }
         else
-            return res.send({ 'isuserinfo': '0','message':'db error'});
+            return res.send({ 'getuserinfo': '0','message':'db error'});
     });
 });
 
