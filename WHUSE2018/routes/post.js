@@ -39,8 +39,11 @@ router.post('/add', isAuthentic, function (req, res, next) {//newpost: title,con
     }).then((r) => {
         if (!r.ok)//buzhichi shiwu shi zhen de kongbu,buzhidao zenme zuo rollback            
             res.send({ 'addpost': '0', message: 'failed to add post id for user,manually add from db please.' });//na wo jiu bu zuo rollback le ba ,naoketong
-        else
+        else {
             res.send({ 'addpost': '1' });
+            postCollection.ensureIndex({ titleIndex: 1 });
+            postCollection.ensureIndex({contentIndex:1});
+        }
         return;
     }).catch((err) => {
         res.send({ 'addpost': '0', message: 'db error' });
@@ -125,10 +128,10 @@ router.post('/search/:type/:page', function (req, res, next) {
     var textParts = defaultSegment(text);
 
     postCollection.find({
-        'type': type, $or: [{
-            titleIndex: { $elemMatch: { $in: textParts } },
-            contentIndex: { $elemMatch: { $in: textParts } }
-        }]
+        'type': type, $or: [
+            { titleIndex: { $in: textParts } },
+            { contentIndex: { $in: textParts }}
+        ]
     }, { limit: pageLimit, skip: skipNum }).
         then((result) => {
             res.send({ 'searchpost': '1', 'result': result });

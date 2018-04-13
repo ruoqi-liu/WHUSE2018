@@ -5,7 +5,6 @@ segment.useDefault();
 segment.loadStopwordDict('stopword.txt');
 
 var getDefaultSegment = function (doc) {
-    console.log(doc);
     return segment.doSegment(doc, {
         simple: true,
         stripPunctuation: true,
