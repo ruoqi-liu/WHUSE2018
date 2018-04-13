@@ -13,4 +13,4 @@ var getDefaultSegment = function (doc) {
     });
 };
 
-console.log(getDefaultSegment('zhe时一段中文的ceshi，sad.//././.this 是 a test of English'));
+exports.defaultSegment = getDefaultSegment;

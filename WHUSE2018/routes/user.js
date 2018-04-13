@@ -52,7 +52,7 @@ router.post('/login', function (req, res, next) {
 
 router.post('/register', function (req, res, next) {//add
     passport.authenticate('signUp', function (err, user, info) {
-        if (err) next(err);
+        if (err) return next(err);
         if (!user) {
             req.flash('error', { msg: info.message });
             req.logout();
@@ -118,7 +118,7 @@ router.delete('/:name', isAuthentic, function (req, res, next) {//delete
 
 
 router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {//user name,userinfo,tags,posts[postid,title]
-    collection.find({ name: req.params.name }, { fields: { password: 0 } }).then((doc) => {
+    collection.find({ name: req.params.name}, { fields: { password: 0 } }).then((doc) => {
         if (doc.length != 1)
             return res.send({ 'getuser': '0', message: 'db.find result incorrect' });
         doc = doc[0];
@@ -136,7 +136,6 @@ router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {//u
 });
 
 
-router.use('/logout', logout
-);
+router.use('/logout', logout);
 
 module.exports = router;

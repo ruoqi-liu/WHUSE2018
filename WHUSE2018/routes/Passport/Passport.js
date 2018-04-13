@@ -85,7 +85,7 @@ var userLogout = function (req, res, next) {
 var userNameVerify = function (req, res, next) {
     var user = req.session.passport.user;
     var name = req.params.name;//name 应该不会是null,因为在url path中
-    if (!name||name != user.name) return res.send({ 'tologin': '1','message':'incorrespond username' });
+    if (!name || name != user.username) return res.send({ 'tologin': '1','message':'incorrespond username' });
     return next();
 }
 
@@ -97,7 +97,7 @@ var postOwnerVerify = function (req, res, next) {
         if (result.length == 0) return res.send({ 'ispostowner': '0', message: 'incorrect postid' });
         result = result[0];
         var postname = result.postinfo.username;
-        if (postname != user.name) return res.send({ 'ispostowner': '0', message: 'not the owner' });
+        if (postname != user.username) return res.send({ 'ispostowner': '0', message: 'not the owner' });
         return next();
     }).catch((err) => { console.log(err);});
 };
@@ -106,3 +106,4 @@ exports.userNameVerify = userNameVerify;
 exports.authentic = isAuthenticated;
 exports.passport = passport;
 exports.logout = userLogout;
+exports.postOwnerVerify = postOwnerVerify;

@@ -11,11 +11,17 @@ var db = monk('localhost:27017/WHUSE');
 var collection = db.get('user');
 
 router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {
-    collection.findOne({ 'name': req.params.name }, { fields: { tags: 1 } }).then((result) => {
-        if (!result)
-            return res.send({ 'getusertags': '0', message: 'no user found in db' });
-        return res.send({ 'getusertags': '1', tags: result });
-    }).catch((err) => { console.log(err)});
+    collection.find({ 'name': req.params.name }, { fields: { tags: 1,_id:0 } }).then((result) => {
+        if (result.length != 1) {
+            res.send({ 'getusertags': '0', message: 'no user found in db' });
+            return;
+        }
+        
+        res.send({ 'getusertags': '1', tags: result[0].tags });
+    }).catch((err) => {
+        res.send({ 'getusertags': '0', message: 'db error' });
+        console.log(err);
+    });
 });
 
 
@@ -23,9 +29,12 @@ router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {
 router.post('/:name', isAuthentic, userNameVerify, function (req, res, next) {
     collection.update({ 'name': req.params.name }, { $push: { tags: { $each: req.body.newtags } } }).
         then((result) => {
-            if (result.length == 1) return res.send({ 'addtags': '1' });
-            return res.send({ 'addtags': '0', message: 'add tags failed' });
-        }).catch((err) => { console.log(err) });
+            if (result.n == 1) return res.send({ 'addtags': '1' });
+             res.send({ 'addtags': '0', message: 'add tags failed' });
+        }).catch((err) => {
+            res.send({ 'addtags': '0', message: 'db error' });
+            console.log(err);
+        });
 
 });
 
@@ -33,9 +42,12 @@ router.post('/:name', isAuthentic, userNameVerify, function (req, res, next) {
 router.delete('/:name', isAuthentic, userNameVerify, function (req, res, next) {
     collection.update({ 'name': req.params.name }, { $pullAll: { tags: req.body.deletetags } }).
         then((result) => {
-            if (result.length == 1) return res.send({ 'deletetags': '1' });
-            return res.send({ 'deletetags': '0', message: 'delete tags failed' });
-        }).catch((err) => { console.log(err) });
+            if (result.n == 1) return res.send({ 'deletetags': '1' });
+            res.send({ 'deletetags': '0', message: 'delete tags failed' });
+        }).catch((err) => {
+            res.send({ 'deletetags': '0', message: 'db error' });
+            console.log(err);
+        });
 });
 
 module.exports = router;
