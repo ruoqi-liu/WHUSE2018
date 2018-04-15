@@ -41,8 +41,8 @@ router.post('/add', isAuthentic, function (req, res, next) {//newpost: title,con
             res.send({ 'addpost': '0', message: 'failed to add post id for user,manually add from db please.' });//na wo jiu bu zuo rollback le ba ,naoketong
         else {
             res.send({ 'addpost': '1' });
-            postCollection.ensureIndex({ titleIndex: 1 });
-            postCollection.ensureIndex({contentIndex:1});
+            postCollection.createIndex({titleIndex:1});
+            postCollection.createIndex({contentIndex:1});
         }
         return;
     }).catch((err) => {
