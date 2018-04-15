@@ -20,13 +20,14 @@ router.get('/:name', isAuthentic,userNameVerify,function (req, res, next) {
 
         if (result.length == 1) {
             result = result[0];
-            return res.send({ 'getuserinfo': '1', userinfo: result.userinfo });
+            return res.send({ 'getuserinfo': '1', userinfo: result.userinfo });//userinfo :photo,balablaa
         }
         else
             return res.send({ 'getuserinfo': '0','message':'db error'});
     });
 });
 
+//requied content:{}
 router.put('/:name', isAuthentic,userNameVerify, function (req, res, next) {
     var name = req.params.name;
 

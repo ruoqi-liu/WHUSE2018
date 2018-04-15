@@ -15,6 +15,8 @@ var postCollection = db.get('post');
 //router.use(passport.session());
 //router.use(flash());
 
+
+//required body.name,password
 router.post('/login', function (req, res, next) {
     passport.authenticate('logIn',
         function (err, user, info) {//user and info are passed by the PassportChain not in the session
@@ -49,7 +51,7 @@ router.post('/login', function (req, res, next) {
 //    return;
 //}
 
-
+//required body.name,password
 router.post('/register', function (req, res, next) {//add
     passport.authenticate('signUp', function (err, user, info) {
         if (err) return next(err);
@@ -82,21 +84,27 @@ router.post('/register', function (req, res, next) {//add
 //});
 //return;
 
+//required body.password,content:{name:[,password(optional)]}
 router.put('/:name', isAuthentic, function (req, res, next) {//update username or password
     if (!req.body.content) return res.send({ 'isupdate': '0', 'message': 'content null' });
     var content = req.body.content;
+    var updateQuery = { 'name': content.name };
+    if (content.password)
+        updateQuery['password'] = content.password;
     collection.update({ name: req.params.name, password: req.body.password }, {
-        $set: { 'name': content.name, 'password': content.password }
-    }, function (err, result) {
+        $set:  updateQuery 
+    }
+        , function (err, result) {
+            console.log(result);
         if (err)
             if (err.code == 11000)
                 res.send({ 'isupdate': '0', 'message': 'duplicated name' });
             else
                 res.send({ 'isupdate': '0', 'message': 'unkonwn' });
-        else if (result.length > 0)
+        else if (result.ok==1)
             res.send({ 'isupdate': '1' });
         else
-            res.send({ 'isupdate': '0', 'message': 'invalid password' });// 前端需要判断，新密码不能与原密码相同
+            res.send({ 'isupdate': '0', 'message': 'password no change' });
         return;
     }
     );
@@ -104,6 +112,7 @@ router.put('/:name', isAuthentic, function (req, res, next) {//update username o
 });
 
 
+//required body.password
 router.delete('/:name', isAuthentic, function (req, res, next) {//delete
     collection.remove({ name: req.params.name, password: req.body.password }, function (err, result) {
         if (err) {
@@ -117,6 +126,7 @@ router.delete('/:name', isAuthentic, function (req, res, next) {//delete
 });
 
 
+//required 
 router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {//user name,userinfo,tags,posts[postid,title]
     collection.find({ name: req.params.name}, { fields: { password: 0 } }).then((doc) => {
         if (doc.length != 1)
@@ -126,7 +136,7 @@ router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {//u
         var postids = doc.postid;
         postCollection.find({ '_id': { $in: postids } }, { fields: { title: 1 } }).then((posts) => {
             delete doc['postid'];
-            doc['posts'] = posts;//array of {_id,title}
+            doc['posts'] = posts;//posts: array of {_id,title}
             return res.send({ 'getuser': '1', user: doc }).catch(err => { console.log(err); });
         });
     }).catch(err => {
