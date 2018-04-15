@@ -1,11 +1,245 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>失物招领主页</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
+    <style type="text/css"></style>
+    <script>
+        function showUser() {
+            document.getElementById("user").style.display = "block";
+            document.getElementById("quit").style.display = "block";
+
+            document.getElementById("login").style.display = "none";
+            document.getElementById("register").style.display = "none";
+        }
+
+        function hiddenUser() {
+            document.getElementById("user").style.display = "none";
+            document.getElementById("quit").style.display = "none";
+
+            document.getElementById("login").style.display = "block";
+            document.getElementById("register").style.display = "block";
+        }
+
+        let classList;
+        function hiddenList() {
+            classList = document.getElementById("list").getAttribute("class");
+            classList = classList.replace("active", "");
+            document.getElementById("list").setAttribute("class", classList);
+            classList = document.getElementById("map").getAttribute("class");
+            classList = classList.concat(" active");
+            document.getElementById("map").setAttribute("class", classList);
+        }
+
+        function showList() {
+            classList = document.getElementById("map").getAttribute("class");
+            classList = classList.replace("active", "");
+            document.getElementById("map").setAttribute("class", classList);
+            classList = document.getElementById("list").getAttribute("class");
+            classList = classList.concat(" active");
+            document.getElementById("list").setAttribute("class", classList);
+        }
+
+        let inputList;
+        function checkInput() {
+            inputList = document.getElementById("inputList").getElementsByTagName("input");
+            for(var i = 0; i < inputList.length; i++){
+                if(inputList[i].value.length === 0){
+                    alert("请填写所有信息!");
+                    inputList[i].focus();
+                    return false;
+                }
+            }
+            alert("提交完成!");
+            $('#lostModal').modal('hide');
+        }
+
+        let formApp = angular.module('submitInput', []);
+        formApp.controller('submitCtrl', function ($scope, $http) {
+            $scope.lost = {};
+            $scope.submitForm = function () {
+                $http({
+                    method:'POST',
+                    url:'http://localhost:3001',
+                    data:$.param($scope.lost),
+                    headers:{
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                    .success(function (data) {
+                        console.log(data);
+                    });
+            };
+        });
+
+        function showInfo(id, image, type, time, content){
+            let html = '<div class = "panel-body">' +
+                '<img src =' + image + ' class = "img-responsive center-block"  style = "height : 300px">' +
+                '</div>' +
+                '<div class = "panel-body">' +
+                '<div class = "caption">' +
+                '<h4><b>' + type + '</b></h4>' +
+                '<p><b>' + time + '</b></p>' +
+                '<p>' + content + '</p>' +
+                '</div>';
+            '</div>'
+            document.getElementById(id).innerHTML += html;
+        }
+    </script>
+</head>
+
+<body>
+<nav class = "navbar navbar-default" role = "navigation">
+    <div class = "container-fluid col-md-12">
+        <div class = "navbar-header col-md-2">
+            <a class = "navbar-brand fa fa-smile-o fa-2x" href = ""> iManager</a>
+        </div>
+
+        <div class = "col-md-10">
+            <div class = "col-md-2">
+                <ul class = "nav navbar-nav">
+                    <li><a href = "#"><b>返回主页</b></a></li>
+                    <li class = "active"><a href = "#"><b>失物招领</b></a></li>
+                </ul>
+            </div>
+
+            <div class = "col-md-3">
+                <button id = "publish" type = "button" class = "btn btn-default navbar-btn navbar-middle" data-toggle = modal data-target = #lostModal>
+                    <span class = "fa fa-edit">&nbsp发布</span>
+                </button>&nbsp&nbsp&nbsp
+                <button id = "list" type = "button" class = "btn btn-default navbar-btn navbar-middle active" onclick = "showList()">
+                    <span class = "fa fa-list-ul">&nbsp列表</span>
+                </button>&nbsp&nbsp&nbsp
+                <button id = "map" type = "button" class = "btn btn-default navbar-btn navbar-middle" onclick = "hiddenList()">
+                    <span class = "fa fa-map-o">&nbsp地图</span>
+                </button>
+            </div>
+
+            <div class = "col-md-3">
+                <div class = "input-group input-group-lg">
+                    <input type = "text" class = "form-control">
+                    <span class = "input-group-btn"><button class = "btn btn-default" type = "button">搜索</button></span>
+                </div>
+            </div>
+
+            <div class = "col-md-3">
+                <ul class = "nav navbar-nav navbar-right">
+                    <li style = "display: block" id = "login" onclick="showUser()"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
+                    <li style = "display: block" id = "register"><a><span class = "fa fa-pencil" onclick ="showInfo('info1', '/images/fw.jpg', '校园卡', '18:42  03/01/2018', '学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925')">&nbsp&nbsp注册</span></a></li>
+                    <li style = "display: none" id = "user"><a><span class = "fa fa-user">&nbsp&nbsp用户</span></a></li>
+                    <li style = "display: none" id = "quit" onclick = "hiddenUser()"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class = "modal fade" id = "lostModal" tabindex = "-1" role = "dialog" aria-labelledby = "lostModalLabel" aria-hidden = "true">
+            <div class = "modal-dialog">
+                <div class = "modal-content">
+                    <div class = "modal-header">
+                        <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
+                        <h4 class = "modal-title" id = "modalHeader">发布失物招领信息</h4>
+                    </div>
+                    <div class = "modal-body" ng-app = "submitInput" ng-controller = "submitCtrl">
+                        <form id = "inputList" class="form-horizontal" role = "form" ng-submit = "submitForm">
+                            <div class = "form-group">
+                                <lable for = "phoneNumber" class = "col-md-4 control-label fa fa-phone"> 联系方式</lable>
+                                <div class = "col-md-8 input-icon-group">
+                                    <input type = "text" class = "form-control fc-clear" id = "phoneNumber" placeholder = "请输入联系方式" ng-model = "lost.phone">
+                                </div>
+                            </div>
+                            <div class = "form-group">
+                                <label for = "location" class = "col-md-4 control-label fa fa-map-marker"> 拾取位置</label>
+                                <div class = "col-md-8">
+                                    <input type = "text" class = "form-control" id = "location" placeholder = "请输入拾取失物的地点" ng-model = "lost.location">
+                                </div>
+                            </div>
+                            <div class = "form-group">
+                                <label for = "name" class = "col-md-4 control-label fa fa-at"> 物品名称</label>
+                                <div class = "col-md-8">
+                                    <input type = "text" class = "form-control" id = "name" placeholder = "请输入物品名称" ng-model = "lost.name">
+                                </div>
+                            </div>
+                            <div class = "form-group">
+                                <label for = "type" class = "col-md-4 control-label fa fa-navicon"> 物品类别</label>
+                                <div class = "col-md-8">
+                                    <select class = "form-control" ng-model = "lost.type">
+                                        <option>校园卡</option>
+                                        <option>现金</option>
+                                        <option>生活物品</option>
+                                        <option>学习资料</option>
+                                        <option>电子产品</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class = "form-group">
+                                <label for = "content" class = "col-md-4 control-label fa fa-expand">   详细信息</label>
+                                <div class = "col-md-8">
+                                    <input type = "text" class = "form-control" id = "content" placeholder = "请输入物品简介" ng-model = "lost.content">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class = "modal-footer">
+                        <button type = "button" class = "btn btn-default" data-dismiss = "modal">取消</button>
+                        <button type = "button" class = "btn btn-primary" onclick = "checkInput()">发布</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</nav>
+
+<div class = "container-fluid">
+    <div class = "col-md-offset-1 col-md-10">
+        <div id = "info1" class = "panel panel-default col-md-3">
+
+        </div>
+        <div class = "panel panel-default col-md-offset-1 col-md-3">
+            <div class = "panel-body">
+                <img src = "/images/fw.jpg" class = "img-responsive center-block"  style = "height : 300px">
+            </div>
+            <div class = "panel-body">
+                <div class = "caption">
+                    <h4><b>校园卡</b></h4>
+                    <p><b>18:42  03/01/2018</b></p>
+                    <p>学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925</p>
+                </div>
+            </div>
+        </div>
+        <div class = "panel panel-default col-md-offset-1 col-md-3">
+            <div class = "panel-body">
+                <img src = "/images/fw.jpg" class = "img-responsive center-block"  style = "height : 300px">
+            </div>
+            <div class = "panel-body">
+                <div class = "caption">
+                    <h4><b>校园卡</b></h4>
+                    <p><b>18:42  03/01/2018</b></p>
+                    <p>学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row clearfix">
+    <div class="col-md-4 column">
+    </div>
+    <div class="col-md-4 column">
+        <ul class="pager">
+            <li class="previous"><a href="#">&larr; 上一页</a></li>
+            <li class="next"><a href="#">下一页 &rarr;</a></li>
+        </ul>
+    </div>
+    <div class="col-md-4 column">
+    </div>
+</div>
+</body>
 </html>
