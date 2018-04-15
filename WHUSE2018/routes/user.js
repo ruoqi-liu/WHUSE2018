@@ -125,7 +125,6 @@ router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {//u
         req.flash('userdoc', doc);
         var postids = doc.postid;
         postCollection.find({ '_id': { $in: postids } }, { fields: { title: 1 } }).then((posts) => {
-            var doc = req.flash('userdoc');
             delete doc['postid'];
             doc['posts'] = posts;//array of {_id,title}
             return res.send({ 'getuser': '1', user: doc }).catch(err => { console.log(err); });
