@@ -1,10 +1,15 @@
 const cheerio = require('cheerio');
 const superagent = require('superagent');
 var defaultSegment = require('../Segment/mySegment').defaultSegment;
-var monk = require('monk');
-var db = monk('localhost:27017/WHUSE');
-var ALLInfo = db.get('news');
-var tagsCollection = db.get('tags');
+//var monk = require('monk');
+//var db = monk('localhost:27017/WHUSE');
+//var ALLInfo = db.get('news');
+//var tagsCollection = db.get('tags');
+var insertNewsData = require('./dbOp').insertNewsData;
+var getMinDate = require('./dbOp').getMinDate;
+var insertOrUpdateTags = require('./dbOp').insertOrUpdateTags;
+var updateMinDate = require('./dbOp').updateMinDate;
+
 var CSURL = [
 			'cs.whu.edu.cn/a/xueshujiangzuofabu/list_39_1.html',
 			'cs.whu.edu.cn/a/xinwendongtaifabu/list_37_1.html',
@@ -12,10 +17,6 @@ var CSURL = [
 			'cs.whu.edu.cn/a/xinxigongkaifabu/list_38_1.html'
 			];
 
-//function appendSet(set,tagarray) {
-//    for (i = 0; i < tagarray.length; ++i)
-//        set.add(tagarray[i]);
-//}
 
 function entrance()
 {
@@ -25,25 +26,31 @@ function entrance()
 //		processFirPart(res);
 //	}
 //);
-    var minDate;
-    ALLInfo.findOne({}, { sort: { date: -1 } }, function (err, docs) {
-        if (docs)
-            minDate = docs.date;
-        else
-            minDate = '1970';
+//var minDate;
+//ALLInfo.findOne({}, { sort: { date: -1 } }, function (err, docs) {
+//    if (docs)
+//        minDate = docs.date;
+//    else
+//        minDate = '1970';
+//});
+    updateMinDate().then(() => {//after update
+        var minDate = getMinDate();
+        console.log(minDate);
+        for (i = 0; i < CSURL.length; ++i) {
+            superagent.get(CSURL[i]).end(function (err, res) {
+                if (err) throw err;
+                processCSHTML(res, minDate);
+            }
+            );
+        }
     });
-	for (i = 0; i < CSURL.length; ++i) {
-		superagent.get(CSURL[i]).end(function (err, res) {
-			if (err) throw err;
-			processCSHTML(res,minDate);
-		}
-		);
-    }
 }
 
-function insertOrUpdateTags(tag) {
-    tagsCollection.update({ 'tag': tag }, { $inc: { times: 1 } }, { upsert: true }).catch((err) => { console.log(err); });
-}
+//function insertOrUpdateTags(tag) {
+//    tagsCollection.createIndex({ tag: 1 }, { unique: true });
+//    tagsCollection.update({ 'tag': tag }, { $inc: { times: 1 } }, { upsert: true }).catch((err) => { console.log(err); });
+//}
+
 
 function processCSHTML(res, minDate) {
 
@@ -67,28 +74,13 @@ function processCSHTML(res, minDate) {
         }
     });
     
-    tagsCollection.createIndex({ tag: 1 }, {unique:true});
+    
     for (i = 0; i < tags.length; ++i)
         insertOrUpdateTags(tags[i]);
-    ALLInfo.createIndex({ tags: 1 });
-    ALLInfo.insert(data).catch((err) => { console.log(err); });
+	
+    insertNewsData(data);
 }
 
-
-
-function display() {
- 
-    ALLInfo.findOne({}, { sort: {date : -1}}, function (err, doc) {// date descend
-        if (err) console.log(err);
-        console.log(doc);
-
-    });
-    tagsCollection.find({}, { sort: { times: -1 }, limit: 10 }).then((docs) => {
-        console.log(docs);
-
-    }).catch(err => { console.log(err); })
-}
-
+//setInterval(entrance,60*60*1000);//per hour
 entrance();
-setInterval(entrance,60*60*1000);//per hour
-display();
+module.exports = entrance;
