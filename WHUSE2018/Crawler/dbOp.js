@@ -1,3 +1,4 @@
+
 var monk = require('monk');
 var db = monk('localhost:27017/WHUSE');
 var ALLInfo = db.get('news');
@@ -5,6 +6,7 @@ var tagsCollection = db.get('tags');
 
 var minDate = '1970';
 var getMinDate = function () {
+    //console.log(minDate);
     if (minDate)
         return minDate;
     else
@@ -12,9 +14,10 @@ var getMinDate = function () {
 };
 
 async function updateMinDate() {
+ 
     try {
-        await ALLInfo.findOne({}, { sort: { date: -1 } }).then((docs) => {
-            console.log(docs);
+         await ALLInfo.findOne({}, { sort: { date: -1 } }).then((docs) => {
+           //console.log(docs);
             if (docs)
                 minDate = docs.date;
             else

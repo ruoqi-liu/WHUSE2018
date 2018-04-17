@@ -18,7 +18,7 @@ var CSURL = [
 ];
 
 
-function entrance() {
+async function entrance() {
     //	superagent.get(url2).end(function (err, res) {
     //		console.log(res);
     //		if (err) throw err;
@@ -33,18 +33,17 @@ function entrance() {
     //        minDate = '1970';
     //});
 
-    updateMinDate().then(() => {
-        var minDate = getMinDate();
-        console.log(minDate);
+    var minDate = getMinDate();
+    //console.log(minDate);
         for (i = 0; i < CSURL.length; ++i) {
-            superagent.get(CSURL[i]).end(function (err, res) {
-                if (err) throw err;
-                processCSHTML(res, minDate);
+            superagent.get(CSURL[i]).end(async function (err, res) {
+                if (err) throw err;              
+                await processCSHTML(res, minDate);
             }
             );
         }
-    });
-}
+    }
+
 
 //function insertOrUpdateTags(tag) {
 //    tagsCollection.createIndex({ tag: 1 }, { unique: true });
@@ -84,5 +83,4 @@ function processCSHTML(res, minDate) {
 
 
 //setInterval(entrance,60*60*1000);//per hour
-entrance();
-module.exports = entrance;
+exports.entrance = entrance;
