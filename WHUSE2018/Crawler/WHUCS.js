@@ -11,29 +11,29 @@ var insertOrUpdateTags = require('./dbOp').insertOrUpdateTags;
 var updateMinDate = require('./dbOp').updateMinDate;
 
 var CSURL = [
-			'cs.whu.edu.cn/a/xueshujiangzuofabu/list_39_1.html',
-			'cs.whu.edu.cn/a/xinwendongtaifabu/list_37_1.html',
-			'cs.whu.edu.cn/plus/list.php?tid=44',
-			'cs.whu.edu.cn/a/xinxigongkaifabu/list_38_1.html'
-			];
+    'cs.whu.edu.cn/a/xueshujiangzuofabu/list_39_1.html',
+    'cs.whu.edu.cn/a/xinwendongtaifabu/list_37_1.html',
+    'cs.whu.edu.cn/plus/list.php?tid=44',
+    'cs.whu.edu.cn/a/xinxigongkaifabu/list_38_1.html'
+];
 
 
-function entrance()
-{
-//	superagent.get(url2).end(function (err, res) {
-//		console.log(res);
-//		if (err) throw err;
-//		processFirPart(res);
-//	}
-//);
-//var minDate;
-//ALLInfo.findOne({}, { sort: { date: -1 } }, function (err, docs) {
-//    if (docs)
-//        minDate = docs.date;
-//    else
-//        minDate = '1970';
-//});
-    updateMinDate().then(() => {//after update
+function entrance() {
+    //	superagent.get(url2).end(function (err, res) {
+    //		console.log(res);
+    //		if (err) throw err;
+    //		processFirPart(res);
+    //	}
+    //);
+    //var minDate;
+    //ALLInfo.findOne({}, { sort: { date: -1 } }, function (err, docs) {
+    //    if (docs)
+    //        minDate = docs.date;
+    //    else
+    //        minDate = '1970';
+    //});
+
+    updateMinDate().then(() => {
         var minDate = getMinDate();
         console.log(minDate);
         for (i = 0; i < CSURL.length; ++i) {
@@ -56,7 +56,7 @@ function processCSHTML(res, minDate) {
 
     let $ = cheerio.load(res.text);
     let data = [];
-    var tags=[];
+    var tags = [];
     $('#container dl dd').each(function (i, element) {
         let _this = $(element);
         var _date = _this.find('i').text();
@@ -73,13 +73,15 @@ function processCSHTML(res, minDate) {
             });
         }
     });
+
+
     
-    
-    for (i = 0; i < tags.length; ++i)
-        insertOrUpdateTags(tags[i]);
-	
+    insertOrUpdateTags(tags);
+
     insertNewsData(data);
 }
+
+
 
 //setInterval(entrance,60*60*1000);//per hour
 entrance();

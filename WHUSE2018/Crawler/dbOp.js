@@ -11,19 +11,25 @@ var getMinDate = function () {
         return '1970';
 };
 
-var updateMinDate = function () {
-    return ALLInfo.findOne({}, { sort: { date: -1 } }).then((docs)=> {
-        console.log(docs);
-        if (docs)
-            minDate = docs.date;
-        else
-            minDate = '1970';
-    });
+async function updateMinDate() {
+    try {
+        await ALLInfo.findOne({}, { sort: { date: -1 } }).then((docs) => {
+            console.log(docs);
+            if (docs)
+                minDate = docs.date;
+            else
+                minDate = '1970';
+        });
+    }
+    catch (err) { console.log(err);}
 };
 
-var insertOrUpdateTags = function (tag) {
+var insertOrUpdateTags =async function (tags) {
+
     tagsCollection.createIndex({ tag: 1 }, { unique: true });
-    tagsCollection.update({ 'tag': tag }, { $inc: { times: 1 } }, { upsert: true }).catch((err) => { console.log(err); });
+
+    for (i = 0; i < tags.length; ++i)
+      await  tagsCollection.update({ 'tag': tags[i] }, { $inc: { times: 1 } }, { upsert: true });
 };
 
 var insertNewsData = function (data) {

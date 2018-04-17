@@ -63,8 +63,8 @@ function processEMHTML(res, minDate) {
     });
 
 
-    for (i = 0; i < tags.length; ++i)
-        insertOrUpdateTags(tags[i]);
+    
+    insertOrUpdateTags(tags);
     ALLInfo.insert(data).then((ops) => {
         updateAriticlesDate(ops);
     }).catch(err => { console.log(err); });
