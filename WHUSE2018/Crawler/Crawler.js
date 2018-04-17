@@ -10,5 +10,5 @@ async function getNews() {
     await EMEntrance();
     
 }
-getNews();
-//setInterval(getNews,60*60*1000);
+//getNews();
+setInterval(getNews,60*60*1000);
