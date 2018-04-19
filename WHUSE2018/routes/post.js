@@ -13,7 +13,7 @@ var db = monk('localhost:27017/WHUSE');
 var collection = db.get('user');
 var postCollection = db.get('post');
 
-router.post('/add', isAuthentic, function (req, res, next) {//newpost: title,content,type,postinfo{username,phone,¡­¡­}
+router.post('/add', isAuthentic, function (req, res, next) {//newpost: title,content,type,postinfo{username,phone,Â¡Â­Â¡Â­}
     var newPost = req.body.newpost;
     if (!newPost) return res.send({ 'addpost': '0', 'message': 'missing important paramerters' });
     var type = newPost.type;
@@ -72,18 +72,16 @@ router.put('/:postid', isAuthentic, postOwnerVerify, function (req, res, next) {
     var title = updatePost.title;
     var content = updatePost.content;
     var postInfo = updatePost.postinfo;
-    if (!postInfo || !type || !content || !postInfo) return res.send({ 'updatepost': '0', 'message': 'missing important paramerters' });
     if (!title)
-        title = updatePost.type;
+        updatePost['title'] = updatePost.type;
     postInfo['username'] = req.session.passport.user.username;
     var titleIndex = defaultSegment(title);
     var contentIndex = defaultSegment(content);
-
+    updatePost['titleIndex'] = titleIndex;
+    updatePost['contentIndex'] = contentIndex;
+    
     postCollection.update({ _id: req.params.postid }, {
-        $set: {
-            'title': title, 'type': type, 'content': content,
-            'postinfo': postInfo, 'titleIndex': titleIndex, 'contentIndex': contentIndex
-        }
+        $set: updatePost
     })
         .then((result) => {
             if (result.n == 1) return res.send({ 'updatepost': '1' });
