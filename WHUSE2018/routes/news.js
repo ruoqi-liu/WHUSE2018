@@ -14,9 +14,12 @@ var collection = db.get('user');
 var newsCollection = db.get('news');
 
 //required body.searchtext body.faculty:[]
-router.post('/search', function (req, res, next) {
+router.post('/search/:page', function (req, res, next) {
+    var eachPageNum = 10;
+    var page = req.params.page;
+    var limitNum = page*eachPageNum;
     var textParts = defaultSegment(req.body.searchText);
-    newsCollection.find({ 'faculty': { $in: req.body.faculty }, 'tags': { $in: textParts } }, { fields: { tags: 0 }, sort: { date: -1 }, limit: 10 }).then(results => {
+    newsCollection.find({ 'faculty': { $in: req.body.faculty }, 'tags': { $in: textParts } }, { fields: { tags: 0 }, sort: { date: -1 }, limit: limitNum }).then(results => {
         res.send({ 'searchnews': '1', 'news': results });
         return;
     }).catch(err => {
@@ -26,13 +29,16 @@ router.post('/search', function (req, res, next) {
 });
 
 //required faculty:[]
-router.post('/:name', isAuthentic, userNameVerify, function (req, res, next) {
+router.post('/:name/:page', isAuthentic, userNameVerify, function (req, res, next) {
+    var eachPageNum = 10;
+    var page = req.parmas.page;
+    var limitNum = page*eachPageNum;
     var name = req.params.name;
     collection.findOne({ 'name': name }).then(doc => {
         var tags = doc.tags;
         var faculty = req.body.faculty;
-        if (!tags || tags.length == 0) return newsCollection.find({ 'faculty': { $in: faculty } }, { sort: { date: -1 }, limit: 10 });
-        return newsCollection.find({ 'faculty': { $in: faculty }, 'tags': { $in: tags } }, { fields: { tags: 0 }, sort: { date: -1 }, limit: 10 });
+        if (!tags || tags.length == 0) return newsCollection.find({ 'faculty': { $in: faculty } }, { sort: { date: -1 }, limit: limitNum });
+        return newsCollection.find({ 'faculty': { $in: faculty }, 'tags': { $in: tags } }, { fields: { tags: 0 }, sort: { date: -1 }, limit: limitNum });
     }).then(results => {
         res.send({ 'getNews': '1', 'news': results });
         return;
