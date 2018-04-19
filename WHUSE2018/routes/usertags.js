@@ -29,10 +29,10 @@ router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {
 router.post('/:name', isAuthentic, userNameVerify, function (req, res, next) {
     collection.update({ 'name': req.params.name }, { $push: { tags: { $each: req.body.newtags } } }).
         then((result) => {
-            if (result.n == 1) return res.send({ 'addtags': '1' });
-             res.send({ 'addtags': '0', message: 'add tags failed' });
+            if (result.n == 1) return res.send({ 'addusertags': '1' });
+             res.send({ 'addusertags': '0', message: 'add tags failed' });
         }).catch((err) => {
-            res.send({ 'addtags': '0', message: 'db error' });
+            res.send({ 'addusertags': '0', message: 'db error' });
             console.log(err);
         });
 
@@ -42,10 +42,10 @@ router.post('/:name', isAuthentic, userNameVerify, function (req, res, next) {
 router.delete('/:name', isAuthentic, userNameVerify, function (req, res, next) {
     collection.update({ 'name': req.params.name }, { $pullAll: { tags: req.body.deletetags } }).
         then((result) => {
-            if (result.n == 1) return res.send({ 'deletetags': '1' });
-            res.send({ 'deletetags': '0', message: 'delete tags failed' });
+            if (result.n == 1) return res.send({ 'deleteusertags': '1' });
+            res.send({ 'deleteusertags': '0', message: 'delete tags failed' });
         }).catch((err) => {
-            res.send({ 'deletetags': '0', message: 'db error' });
+            res.send({ 'deleteusertags': '0', message: 'db error' });
             console.log(err);
         });
 });
