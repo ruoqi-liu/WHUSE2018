@@ -13,8 +13,9 @@ var db = monk('localhost:27017/WHUSE');
 var collection = db.get('user');
 var postCollection = db.get('post');
 
-router.post('/add', isAuthentic, function (req, res, next) {//newpost: title,content,type,postinfo{username,phone,¡­¡­}
+router.post('/add', isAuthentic, function (req, res, next) {//newpost: title,content,type,postinfo{username,phone,ï¿½ï¿½ï¿½ï¿½}
     var newPost = req.body.newpost;
+    console.log(newPost);
     if (!newPost) return res.send({ 'addpost': '0', 'message': 'missing important paramerters' });
     var type = newPost.type;
     var content = newPost.content;
@@ -54,8 +55,10 @@ router.post('/add', isAuthentic, function (req, res, next) {//newpost: title,con
 
 router.get('/:type/:page', function (req, res, next) {
     var type = req.params.type;
-    var pageLimit = 6;
-    var skipNum = (req.params.page - 1) * pageLimit;
+    var pageLimit = 3;
+    var page =req.params.page;
+    if(!page) page = 1;
+    var skipNum = (page- 1) * pageLimit;
     if (skipNum < 0) skipNum = 0;
     postCollection.find({ 'type': type }, { sort: { _id: -1 }, limit: pageLimit, skip: skipNum }, function (err, result) {
         if (err) return next(err);
@@ -119,8 +122,10 @@ router.delete('/:postid', isAuthentic, postOwnerVerify, function (req, res, next
 //require text in body 
 router.post('/search/:type/:page', function (req, res, next) {
     var type = req.params.type;
-    var pageLimit = 6;
-    var skipNum = (req.params.page - 1) * pageLimit;
+    var pageLimit = 3;
+    var page =req.params.page;
+    if(!page) page = 1;
+    var skipNum = (page- 1) * pageLimit;
     if (skipNum < 0) skipNum = 0;
     var text = req.body.text;
     if (!text) return res.send({ 'searchpost': '0', message: 'search text cannnot be null' });
