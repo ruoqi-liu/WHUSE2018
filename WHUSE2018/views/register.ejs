@@ -7,11 +7,12 @@
 
     <title>注册/登录</title>
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <style type="text/css">
         p {font-size: 80%}
-        .btn-success {
+        .btn-primary {
             background-color: #4CAF50;
             border: none;
             color: white;
@@ -25,13 +26,66 @@
     </style>
 
     <script>
+        var registerApp = angular.module("registerApp", []);
+        registerApp.controller("registerCtrl",["$scope", "$http",
+            function($scope, $http) {
+                $scope.register = function(){
+                    var oError = document.getElementById("error_box2");
+                    var isError = false;
+                    var reg = new RegExp(/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/);  //正则表达式判断字符串是否由数字和字母组成
+                    var inputPass = document.getElementById("inputPassword").value;
+                    var repeatPass = document.getElementById("repeatPassword").value;
+                    if ($("#registeruser").val().length > 14) {
+                        oError.innerHTML = "用户名长度过长！";
+                        isError = true;
+                        return;
+                    }
+                    else if ($("#registeruser").val().length == 0) {
+                        oError.innerHTML = "用户名不能为空！";
+                        isError = true;
+                        return;
+                    }
+                    else if ($("#inputPassword").val().length < 6) {
+                        oError.innerHTML = "密码长度必须大于6位！";
+                        isError = true;
+                        return;
+                    }
+                    else if (!reg.test(inputPass)) {
+                        oError.innerHTML = "密码需由字母和数字组成！";
+                        isError = true;
+                        return;
+                    }
+                    else if (inputPass != repeatPass) {
+                        oError.innerHTML = "两次密码输入不一致！";
+                        isError = true;
+                        return;
+                    }
+                    $http({
+                        method: 'post',
+                        url: '/user/register',
+                        data: {
+                            name: document.getElementById("registeruser").value,
+                            password: document.getElementById("inputPassword").value
+                        }
+                    }).then(
+                        function success(res) {
+                            console.log("请求成功", res);
+                            if(res.data.isregister === "1"){
+                                alert("注册成功");
+                            }
+                            else {
+                                alert("注册失败："+ res.data.message);
+                            }
+                        }
+                    )
+                }}
+        ])
 
         $(document).ready(function(){
             $('#logIn').click(function(){
-                $('#modaldiv').modal('show');
+                $('#loginModal').modal('show');
             });
         });
-
     </script>
 </head>
 
@@ -56,17 +110,18 @@
                 <form class="form-group" action="">
                     <div class="form-group has-feedback">
                         <span class="glyphicon glyphicon-user form-control-feedback"></span>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名" autofocus>
+                        <input type="text" class="form-control" id="loginuser" name="username" placeholder="请输入用户名" autofocus>
                     </div>
                     <!-- 密码框 -->
                     <div class="form-group has-feedback">
                         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-                        <input type="password" class="form-control" id="inputPassword" name="password" placeholder="请输入密码">
+                        <input type="password" class="form-control" id="loginpassword" name="password" placeholder="请输入密码">
                     </div>
-                    <a href="" data-toggle="modal" data-dismiss="modal" data-target="#register">忘记密码</a>
+                    <p id="error_box1"><br></p>
+                    <a href="" data-toggle="modal" data-dismiss="modal" data-target="#registerModal">忘记密码</a>
                     <div class="text-right">
                         <button class="btn btn-default" data-toggle="modal" data-dismiss="modal" data-target="#registerModal">注册</button>
-                        <button class="btn btn-success" type="submit">登录</button>
+                        <button class="btn btn-primary" type="button" id="login">登录</button>
                     </div>
                 </form>
             </div>
@@ -90,23 +145,24 @@
                 <form class="form-group" action="">
                     <div class="form-group has-feedback">
                         <span class="glyphicon glyphicon-user form-control-feedback"></span>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="请输入用户名" autofocus>
+                        <input type="text" class="form-control" id="registeruser" name="username" placeholder="请输入用户名" autofocus ng-model="name">
                         <p class="text-muted">不超过7位汉字或14位字母</p>
                     </div>
                     <!-- 密码框 -->
                     <div class="form-group has-feedback">
                         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-                        <input type="password" class="form-control" id="inputPassword" name="password" placeholder="请输入密码">
-                        <p class="text-muted">至少6位字母或数字</p>
+                        <input type="password" class="form-control" id="inputPassword" name="password" placeholder="请输入密码" ng-model="password">
+                        <p class="text-muted">至少6位字母和数字</p>
                     </div>
                     <!-- 确认密码框 -->
                     <div class="form-group has-feedback">
                         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-                        <input type="password" class="form-control" id="inputPassword" name="password" placeholder="请再次输入密码">
+                        <input type="password" class="form-control" id="repeatPassword" name="password" placeholder="请再次输入密码">
                     </div>
-                    <div class="text-right">
+                    <p id="error_box2"><br></p>
+                    <div class="text-right" ng-app = "registerApp" ng-controller = "registerCtrl">
                         <button class="btn btn-default" data-toggle="modal" data-dismiss="modal" data-target="#loginModal">去登录</button>
-                        <button class="btn btn-success" type="submit">注册</button>
+                        <button class="btn btn-primary" type="button" id="register" ng-click = "register()">注册</button>
                     </div>
                 </form>
             </div>
@@ -115,4 +171,3 @@
 </div>
 </body>
 </html>
-

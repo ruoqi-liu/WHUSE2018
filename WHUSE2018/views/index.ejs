@@ -1,3 +1,4 @@
+<%- include register.ejs %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -32,11 +33,19 @@
     <!--[if lt IE 9]>
     <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#logIn').click(function(){
+                $('#loginModal').modal('show');
+            });
+        });
+    </script>
+
     <![endif]-->
 </head>
 
 <body>
-
+<script src="register.ejs"></script>
 <div class="container">
     <div class="row clearfix">
         <div class="col-md-12 column">
@@ -65,6 +74,10 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li>
                             <!--<a href="#"><span class="glyphicon glyphicon-user"></span>&nbsp; 萱萱</a>-->
+                            <!-- 主页的登录按钮 -->
+                            <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#loginModal">
+                                登录
+                            </button>
                             <a href="#"><i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp; 萱萱</a>
                         </li>
                     </ul>
