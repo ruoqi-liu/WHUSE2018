@@ -35,17 +35,23 @@
     <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
     <script>
         $(document).ready(function(){
-            $('#logIn').click(function(){
+            $('#login').click(function(){
                 $('#loginModal').modal('show');
             });
         });
     </script>
-
+    <script>
+        $(document).ready(function(){
+            $('#register').click(function(){
+                $('#registerModal').modal('show');
+            });
+        });
+    </script>
     <![endif]-->
 </head>
 
 <body>
-<script src="register.ejs"></script>
+
 <div class="container">
     <div class="row clearfix">
         <div class="col-md-12 column">
@@ -71,15 +77,11 @@
                         </li>
                     </ul>
 
-                    <ul class="nav navbar-nav navbar-right">
-                        <li>
-                            <!--<a href="#"><span class="glyphicon glyphicon-user"></span>&nbsp; 萱萱</a>-->
-                            <!-- 主页的登录按钮 -->
-                            <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#loginModal">
-                                登录
-                            </button>
-                            <a href="#"><i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp; 萱萱</a>
-                        </li>
+                    <ul class = "nav navbar-nav navbar-right">
+                        <li style = "display: block" id = "login"  data-toggle="modal" data-target="#loginModal"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
+                        <li style = "display: block" id = "register" data-toggle="modal" data-target="#registerModal"><a><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
+                        <li style = "display: none" id = "user"><a><span class = "fa fa-user">&nbsp&nbsp用户</span></a></li>
+                        <li style = "display: none" id = "quit"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
                     </ul>
                 </div>
 
@@ -91,28 +93,24 @@
         <div class="col-md-2 column">
         </div>
         <div class="col-md-8 column">
-                <div class="row clearfix" style="margin-bottom: 15px;">
-                    <div class="col-md-7 column" style="text-align:left;">
-                        <h4>18:42 星期五 3月23日 &nbsp; <span class="glyphicon glyphicon-tint"></span></h4>
-                        <!--<i class="fa fa-thermometer-2 " aria-hidden="true"></i>-->
-                    </div>
-                    <div class="col-md-5 column" style="text-align:right;">
-                        <button type="button" class="btn btn-danger">奖学金</button>
-                        <button type="button" class="btn btn-warning">出国交流</button>
-                        <button type="button" class="btn btn-info">名人讲座</button>
-                    </div>
+
+            <div class="row clearfix" style="margin-bottom: 15px;">
+                <div class="col-md-7 column" style="text-align:left;">
+                    <h4>18:42 星期五 3月23日 &nbsp; <span class="glyphicon glyphicon-tint"></span></h4>
+                    <!--<i class="fa fa-thermometer-2 " aria-hidden="true"></i>-->
+                </div>
+                <div class="col-md-5 column" style="text-align:right;">
                 </div>
             </div>
-            <div class="temp-date">
-                <h4>Hi,萱萱</h4>
+
 
             <div class="content" id="content" style="border-radius:15px; border:1px solid rgb(167,167,167); padding: 20px;">
-                <blockquote>
+
+                <div  style="border-left: 10px solid #00B7FF;">
+                    <!--test in another way-->
                     <div class="row clearfix">
                         <div class="col-md-3 column">
-                            <div style="height:auto; width:10px; border-radius:5px; background: #00B7FF;">
-                            </div>
-                            <img src="img/dept_cs.jpg" class="img-thumbnail"/>
+                            <img src="/images/dept_cs.jpg" class="img-thumbnail" style="margin: 10px 20px;"/>
                         </div>
                         <div class="col-md-8 column">
                             <h5>【珞珈讲坛】萱萱院士谈现代宇宙学</h5>
@@ -127,18 +125,18 @@
                             <br>
                             <br>
                             <a href="#">
-                                <span class="glyphicon glyphicon-chevron-right" style="text-align: center;display:block;"></span>
+                                <span class="glyphicon glyphicon-chevron-right"></span>
                                 <!--<i class="fa fa-chevron-right" aria-hidden="true"></i>-->
                             </a>
                         </div>
                     </div>
-                </blockquote>
-                <blockquote>
+                </div>
+
+                <div  style="border-left: 10px solid #dd514c;">
+                    <!--test in another way-->
                     <div class="row clearfix">
                         <div class="col-md-3 column">
-                            <div style="height:auto; width:10px; border-radius:5px; background: #00B7FF;">
-                            </div>
-                            <img src="img/dept_cs.jpg" class="img-thumbnail"/>
+                            <img src="/images/dept_cs.jpg" class="img-thumbnail" style="margin: 10px 20px;"/>
                         </div>
                         <div class="col-md-8 column">
                             <h5>【珞珈讲坛】萱萱院士谈现代宇宙学</h5>
@@ -153,18 +151,18 @@
                             <br>
                             <br>
                             <a href="#">
-                                <span class="glyphicon glyphicon-chevron-right" style="text-align: center;display:block;"></span>
+                                <span class="glyphicon glyphicon-chevron-right"></span>
                                 <!--<i class="fa fa-chevron-right" aria-hidden="true"></i>-->
                             </a>
                         </div>
                     </div>
-                </blockquote>
-                <blockquote>
+                </div>
+
+                <div  style="border-left: 10px solid #f37b1d;">
+                    <!--test in another way-->
                     <div class="row clearfix">
                         <div class="col-md-3 column">
-                            <div style="height:auto; width:10px; border-radius:5px; background: #00B7FF;">
-                            </div>
-                            <img src="img/dept_cs.jpg" class="img-thumbnail"/>
+                            <img src="/images/dept_cs.jpg" class="img-thumbnail" style="margin: 10px 20px;"/>
                         </div>
                         <div class="col-md-8 column">
                             <h5>【珞珈讲坛】萱萱院士谈现代宇宙学</h5>
@@ -179,18 +177,18 @@
                             <br>
                             <br>
                             <a href="#">
-                                <span class="glyphicon glyphicon-chevron-right" style="text-align: center;display:block;"></span>
+                                <span class="glyphicon glyphicon-chevron-right"></span>
                                 <!--<i class="fa fa-chevron-right" aria-hidden="true"></i>-->
                             </a>
                         </div>
                     </div>
-                </blockquote>
-                <blockquote>
+                </div>
+
+                <div  style="border-left: 10px solid #00B7FF;">
+                    <!--test in another way-->
                     <div class="row clearfix">
                         <div class="col-md-3 column">
-                            <div style="height:auto; width:10px; border-radius:5px; background: #00B7FF;">
-                            </div>
-                            <img src="img/dept_cs.jpg" class="img-thumbnail"/>
+                            <img src="/images/dept_cs.jpg" class="img-thumbnail" style="margin: 10px 20px;"/>
                         </div>
                         <div class="col-md-8 column">
                             <h5>【珞珈讲坛】萱萱院士谈现代宇宙学</h5>
@@ -205,17 +203,44 @@
                             <br>
                             <br>
                             <a href="#">
-                                <span class="glyphicon glyphicon-chevron-right" style="text-align: center;display:block;"></span>
+                                <span class="glyphicon glyphicon-chevron-right"></span>
                                 <!--<i class="fa fa-chevron-right" aria-hidden="true"></i>-->
                             </a>
                         </div>
                     </div>
-                </blockquote>
+                </div>
+
+                <div  style="border-left: 10px solid #f37b1d;">
+                    <!--test in another way-->
+                    <div class="row clearfix">
+                        <div class="col-md-3 column">
+                            <img src="/images/dept_cs.jpg" class="img-thumbnail" style="margin: 10px 20px;"/>
+                        </div>
+                        <div class="col-md-8 column">
+                            <h5>【珞珈讲坛】萱萱院士谈现代宇宙学</h5>
+                            <h6>&nbsp; 03/01/2018</h6>
+                            <p style="font-size: 12px; color: gray; margin-left: 5px;">
+                                这是一个默认的引用实例。这是一个默认的引用实例。
+                                这是一个默认的引用实例。这是一个默认的引用实例。<br>
+                                这是一个默认的引用实例。这是一个默认的引用实例。
+                                这是一个默认的引用实例。这是一个默认的引用实例。</p>
+                        </div>
+                        <div class="col-md-1 column">
+                            <br>
+                            <br>
+                            <a href="#">
+                                <span class="glyphicon glyphicon-chevron-right"></span>
+                                <!--<i class="fa fa-chevron-right" aria-hidden="true"></i>-->
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-2 column">
             </div>
         </div>
-        <div class="col-md-2 column">
-        </div>
-
     </div>
 </div>
 
@@ -230,5 +255,3 @@
 </body>
 </html>
 
-<!--<div style="height:auto; width:10px; border-radius:5px; background: #00B7FF;">-->
-<!--</div>-->
