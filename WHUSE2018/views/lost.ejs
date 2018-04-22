@@ -11,75 +11,129 @@
     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
-    <style type="text/css"></style>
+
+    <style>
+        .a-upload {
+            padding: 4px 10px;
+
+            line-height: 20px;
+            position: relative;
+            cursor: pointer;
+            color: #888;
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+            *display: inline;
+            *zoom: 1
+        }
+
+        .a-upload  input {
+            position: absolute;
+            font-size: 50px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            filter: alpha(opacity=0);
+            cursor: pointer
+        }
+
+        .a-upload:hover {
+            color: #444;
+            background: #eee;
+            border-color: #ccc;
+            text-decoration: none
+        }
+    </style>
+
     <script>
-        function showUser() {
-            document.getElementById("user").style.display = "block";
-            document.getElementById("quit").style.display = "block";
+        //登录后隐藏登录和注册按钮，显示用户和退出按钮，退出时反之,choice为access或quit
+        function login(choice) {
+            if(choice === "access"){
+                document.getElementById("user").style.display = "block";
+                document.getElementById("quit").style.display = "block";
 
-            document.getElementById("login").style.display = "none";
-            document.getElementById("register").style.display = "none";
-        }
-
-        function hiddenUser() {
-            document.getElementById("user").style.display = "none";
-            document.getElementById("quit").style.display = "none";
-
-            document.getElementById("login").style.display = "block";
-            document.getElementById("register").style.display = "block";
-        }
-
-        let classList;
-        function hiddenList() {
-            classList = document.getElementById("list").getAttribute("class");
-            classList = classList.replace("active", "");
-            document.getElementById("list").setAttribute("class", classList);
-            classList = document.getElementById("map").getAttribute("class");
-            classList = classList.concat(" active");
-            document.getElementById("map").setAttribute("class", classList);
-        }
-
-        function showList() {
-            classList = document.getElementById("map").getAttribute("class");
-            classList = classList.replace("active", "");
-            document.getElementById("map").setAttribute("class", classList);
-            classList = document.getElementById("list").getAttribute("class");
-            classList = classList.concat(" active");
-            document.getElementById("list").setAttribute("class", classList);
-        }
-
-        let inputList;
-        function checkInput() {
-            inputList = document.getElementById("inputList").getElementsByTagName("input");
-            for(var i = 0; i < inputList.length; i++){
-                if(inputList[i].value.length === 0){
-                    alert("请填写所有信息!");
-                    inputList[i].focus();
-                    return false;
-                }
+                document.getElementById("login").style.display = "none";
+                document.getElementById("register").style.display = "none";
             }
-            alert("提交完成!");
-            $('#lostModal').modal('hide');
+            else if(choice === "quit"){
+                document.getElementById("user").style.display = "none";
+                document.getElementById("quit").style.display = "none";
+
+                document.getElementById("login").style.display = "block";
+                document.getElementById("register").style.display = "block";
+            }
         }
 
-        let formApp = angular.module('submitInput', []);
-        formApp.controller('submitCtrl', function ($scope, $http) {
-            $scope.lost = {};
-            $scope.submitForm = function () {
-                $http({
-                    method:'POST',
-                    url:'http://localhost:3001',
-                    data:$.param($scope.lost),
-                    headers:{
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                })
-                    .success(function (data) {
-                        console.log(data);
-                    });
-            };
-        });
+        //选择列表或者地图视图时，按钮样式的变化
+        function map2list(show, hidden) {
+            let attributeList;
 
+            attributeList = document.getElementById(hidden).getAttribute("class");
+            attributeList = attributeList.replace("active", "");
+            document.getElementById(hidden).setAttribute("class", attributeList);
+
+            attributeList = document.getElementById(show).getAttribute("class");
+            attributeList = attributeList.concat(" active");
+            document.getElementById(show).setAttribute("class", attributeList);
+        }
+
+        //发布信息，并在发布之前检查发布信息时，提交的表单是否填写完全
+        let publishApp = angular.module("publishApp", []);
+        publishApp.controller("publishCtrl", ["$scope", "$http",
+            function ($scope, $http) {
+                $scope.publish = function () {
+                    let s;
+
+                    s = document.getElementById("infoType");
+                    if (s.value === ""){
+                        alert("请填写所有信息!");
+                        s.focus();
+                        return false;
+                    }
+
+                    s = document.getElementById("lostType");
+                    if (s.value === ""){
+                        alert("请填写所有信息!");
+                        s.focus();
+                        return false;
+                    }
+
+                    let inputList;
+                    inputList = document.getElementById("inputList").getElementsByTagName("input");
+                    for(let i = 0; i < inputList.length; i++){
+                        if(inputList[i].value.length === 0){
+                            alert("请填写所有信息!");
+                            inputList[i].focus();
+                            return false;
+                        }
+                    }
+
+                    $http({
+                        method:'post',
+                        url:'/posts/add',
+                        data: {
+                            newpost: {
+                                title: document.getElementById("lostType").value,
+                                content: document.getElementById("content").value,
+                                type: document.getElementById("infoType").value,
+                                postinfo:
+                                    {
+                                        date: document.getElementById("time").value,
+                                        image: document.getElementById("image").value
+                                    }
+                            }
+                        }
+                    }).then(
+                        function success(res) {
+                            alert(JSON.stringify(res));
+                        }
+                    )
+                }
+            }])
+
+        //根据传入的参数，构造失物招领信息卡片
         function showInfo(id, image, type, time, content){
             let html = '<div class = "panel-body">' +
                 '<img src =' + image + ' class = "img-responsive center-block"  style = "height : 300px">' +
@@ -91,105 +145,155 @@
                 '<p>' + content + '</p>' +
                 '</div>';
             '</div>'
-            document.getElementById(id).innerHTML += html;
+            document.getElementById(id).innerHTML = html;
         }
+
+        let searchApp = angular.module("searchApp", []);
+        searchApp.controller("searchCtrl", ["$scope", "$http",
+            function ($scope, $http) {
+                $scope.search = function () {
+                    $http({
+                        method:'post',
+                        url:window.location.href,
+                        data: {
+                            text: document.getElementById("search").value
+                        }
+                    })
+                }
+            }]).then(
+            function success(res) {
+                let resultArray = res.data.result;
+                showInfo(info1, resultArray[0].postinfo.image, )
+            }
+        )
     </script>
 </head>
 
 <body>
+<!--导航栏-->
 <nav class = "navbar navbar-default" role = "navigation">
     <div class = "container-fluid col-md-12">
+
+        <!--Logo，点击Logo可以返回主页-->
         <div class = "navbar-header col-md-2">
-            <a class = "navbar-brand fa fa-smile-o fa-2x" href = ""> iManager</a>
+            <a class = "navbar-brand fa fa-smile-o fa-2x" href = "/">&nbsp iManager</a>
         </div>
 
+        <!--导航栏-->
         <div class = "col-md-10">
-            <div class = "col-md-2">
+            <!--页面导航，点击返回主页可以返回主页；点击失物招领刷新当前页面-->
+            <div class = "col-md-3">
                 <ul class = "nav navbar-nav">
-                    <li><a href = "#"><b>返回主页</b></a></li>
-                    <li class = "active"><a href = "#"><b>失物招领</b></a></li>
+                    <li><a href = "/"><b>返回主页</b></a></li>
+                    <li class = "active"><a href = "/lost"><b>失物招领</b></a></li>
                 </ul>
             </div>
 
-            <div class = "col-md-3">
+            <!--失物招领页面内导航，点击发布，跳出对应的模态框；点击列表，切换为列表视图；点击地图，切换为地图视图-->
+            <div class = "col-md-4">
                 <button id = "publish" type = "button" class = "btn btn-default navbar-btn navbar-middle" data-toggle = modal data-target = #lostModal>
                     <span class = "fa fa-edit">&nbsp发布</span>
                 </button>&nbsp&nbsp&nbsp
-                <button id = "list" type = "button" class = "btn btn-default navbar-btn navbar-middle active" onclick = "showList()">
+                <button id = "list" type = "button" class = "btn btn-default navbar-btn navbar-middle active" onclick = "map2list('list', 'map')">
                     <span class = "fa fa-list-ul">&nbsp列表</span>
                 </button>&nbsp&nbsp&nbsp
-                <button id = "map" type = "button" class = "btn btn-default navbar-btn navbar-middle" onclick = "hiddenList()">
+                <button id = "map" type = "button" class = "btn btn-default navbar-btn navbar-middle" onclick = "map2list('map', 'list')">
                     <span class = "fa fa-map-o">&nbsp地图</span>
                 </button>
             </div>
 
+            <!--搜索栏，点击搜索，显示匹配的信息-->
             <div class = "col-md-3">
-                <div class = "input-group input-group-lg">
-                    <input type = "text" class = "form-control">
-                    <span class = "input-group-btn"><button class = "btn btn-default" type = "button">搜索</button></span>
+                <div class = "input-group input-group-lg" ng-app="searchApp" ng-controller="searchCtrl">
+                    <input id = "search" type = "text" class = "form-control" title="搜索">
+                    <span class = "input-group-btn"><button class = "btn btn-default" type = "button" ng-click="search()">搜索</button></span>
                 </div>
             </div>
 
-            <div class = "col-md-3">
+            <!--登录注册按钮，成功登录后显示为用户和退出按钮-->
+            <div class = "col-md-2">
                 <ul class = "nav navbar-nav navbar-right">
-                    <li style = "display: block" id = "login" onclick="showUser()"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
-                    <li style = "display: block" id = "register"><a><span class = "fa fa-pencil" onclick ="showInfo('info1', '/images/fw.jpg', '校园卡', '18:42  03/01/2018', '学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925')">&nbsp&nbsp注册</span></a></li>
+                    <li style = "display: block" id = "login"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
+                    <li style = "display: block" id = "register"><a><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
                     <li style = "display: none" id = "user"><a><span class = "fa fa-user">&nbsp&nbsp用户</span></a></li>
-                    <li style = "display: none" id = "quit" onclick = "hiddenUser()"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
+                    <li style = "display: none" id = "quit"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
                 </ul>
             </div>
         </div>
 
+        <!--发布失物招领的模态框-->
         <div class = "modal fade" id = "lostModal" tabindex = "-1" role = "dialog" aria-labelledby = "lostModalLabel" aria-hidden = "true">
             <div class = "modal-dialog">
-                <div class = "modal-content">
+                <div class = "modal-content" ng-app="publishApp" ng-controller="publishCtrl">
+
+                    <!--模态框标题，提供模态框的关闭按钮-->
                     <div class = "modal-header">
                         <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
                         <h4 class = "modal-title" id = "modalHeader">发布失物招领信息</h4>
                     </div>
-                    <div class = "modal-body" ng-app = "submitInput" ng-controller = "submitCtrl">
-                        <form id = "inputList" class="form-horizontal" role = "form" ng-submit = "submitForm">
+
+                    <!--模态框内容,为一个表单-->
+                    <div class = "modal-body">
+                        <form id = "inputList" class="form-horizontal" role = "form">
+
+                            <!--信息类别-->
                             <div class = "form-group">
-                                <lable for = "phoneNumber" class = "col-md-4 control-label fa fa-phone"> 联系方式</lable>
-                                <div class = "col-md-8 input-icon-group">
-                                    <input type = "text" class = "form-control fc-clear" id = "phoneNumber" placeholder = "请输入联系方式" ng-model = "lost.phone">
-                                </div>
-                            </div>
-                            <div class = "form-group">
-                                <label for = "location" class = "col-md-4 control-label fa fa-map-marker"> 拾取位置</label>
+                                <label for = "infoType" class = "col-md-4 control-label fa fa-sort-amount-asc">&nbsp&nbsp信息类别</label>
                                 <div class = "col-md-8">
-                                    <input type = "text" class = "form-control" id = "location" placeholder = "请输入拾取失物的地点" ng-model = "lost.location">
-                                </div>
-                            </div>
-                            <div class = "form-group">
-                                <label for = "name" class = "col-md-4 control-label fa fa-at"> 物品名称</label>
-                                <div class = "col-md-8">
-                                    <input type = "text" class = "form-control" id = "name" placeholder = "请输入物品名称" ng-model = "lost.name">
-                                </div>
-                            </div>
-                            <div class = "form-group">
-                                <label for = "type" class = "col-md-4 control-label fa fa-navicon"> 物品类别</label>
-                                <div class = "col-md-8">
-                                    <select class = "form-control" ng-model = "lost.type">
-                                        <option>校园卡</option>
-                                        <option>现金</option>
-                                        <option>生活物品</option>
-                                        <option>学习资料</option>
-                                        <option>电子产品</option>
+                                    <select id = infoType class = "form-control">
+                                        <option value = "">请选择</option>
+                                        <option value = "寻找失主">寻找失主</option>
+                                        <option value = "失物招领">失物招领</option>
                                     </select>
                                 </div>
                             </div>
+
+                            <!--物品类别-->
                             <div class = "form-group">
-                                <label for = "content" class = "col-md-4 control-label fa fa-expand">   详细信息</label>
+                                <label for = "lostType" class = "col-md-4 control-label fa fa-navicon">&nbsp&nbsp物品类别</label>
                                 <div class = "col-md-8">
-                                    <input type = "text" class = "form-control" id = "content" placeholder = "请输入物品简介" ng-model = "lost.content">
+                                    <select id = lostType class = "form-control">
+                                        <option value = "">请选择</option>
+                                        <option value = "校园卡">校园卡</option>
+                                        <option value = "现金">现金</option>
+                                        <option value = "生活物品">生活物品</option>
+                                        <option value = "学习资料">学习资料</option>
+                                        <option value = "电子产品">电子产品</option>
+                                    </select>
                                 </div>
                             </div>
+
+                            <!--丢失时间-->
+                            <div class = "form-group">
+                                <label for = "time" class = "col-md-4 control-label fa fa-at">&nbsp&nbsp丢失时间</label>
+                                <div class = "col-md-8">
+                                    <input id = "time" type = "text" class = "form-control" placeholder = "请输入时间">
+                                </div>
+                            </div>
+
+                            <!--具体内容-->
+                            <div class = "form-group">
+                                <label for = "content" class = "col-md-4 control-label fa fa-expand">&nbsp&nbsp详细信息</label>
+                                <div class = "col-md-8">
+                                    <input id = "content" type = "text" class = "form-control" placeholder = "请输入物品简介">
+                                </div>
+                            </div>
+
+                            <!--上传图片-->
+                            <div class = "form-group">
+                                <lable for = "image" class = "col-md-4 control-label fa fa-image">&nbsp&nbsp上传图片</lable>
+                                <div class = "col-md-8 input-icon-group">
+                                    <a href="javascript:" class="a-upload">
+                                        <input type="file" name="" id="image">点击这里上传文件
+                                    </a>
+                                </div>
+                            </div>
+
                         </form>
                     </div>
                     <div class = "modal-footer">
                         <button type = "button" class = "btn btn-default" data-dismiss = "modal">取消</button>
-                        <button type = "button" class = "btn btn-primary" onclick = "checkInput()">发布</button>
+                        <button type = "button" class = "btn btn-primary" ng-click= "publish()">发布</button>
                     </div>
                 </div>
             </div>
@@ -198,40 +302,51 @@
     </div>
 </nav>
 
+<!--信息栏-->
 <div class = "container-fluid">
     <div class = "col-md-offset-1 col-md-10">
-        <div id = "info1" class = "panel panel-default col-md-3">
-
-        </div>
-        <div class = "panel panel-default col-md-offset-1 col-md-3">
+        <div id = "info1" class = "panel panel-default col-md-offset-1 col-md-3">
             <div class = "panel-body">
-                <img src = "/images/fw.jpg" class = "img-responsive center-block"  style = "height : 300px">
+                <img src = "/images/test.jpg" class = "img-responsive center-block" style = "height : 150px">
             </div>
             <div class = "panel-body">
                 <div class = "caption">
                     <h4><b>校园卡</b></h4>
                     <p><b>18:42  03/01/2018</b></p>
-                    <p>学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925</p>
+                    <h6>学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925</h6>
                 </div>
             </div>
         </div>
-        <div class = "panel panel-default col-md-offset-1 col-md-3">
+
+        <div id = "info2" class = "panel panel-default col-md-offset-1 col-md-3">
             <div class = "panel-body">
-                <img src = "/images/fw.jpg" class = "img-responsive center-block"  style = "height : 300px">
+                <img src = "/images/test.jpg" class = "img-responsive center-block" style = "height : 150px">
             </div>
             <div class = "panel-body">
                 <div class = "caption">
                     <h4><b>校园卡</b></h4>
                     <p><b>18:42  03/01/2018</b></p>
-                    <p>学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925</p>
+                    <h6>学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925</h6>
+                </div>
+            </div>
+        </div>
+
+        <div id = "info3" class = "panel panel-default col-md-offset-1 col-md-3">
+            <div class = "panel-body">
+                <img src = "/images/test.jpg" class = "img-responsive center-block" style = "height : 150px">
+            </div>
+            <div class = "panel-body">
+                <div class = "caption">
+                    <h4><b>校园卡</b></h4>
+                    <p><b>18:42  03/01/2018</b></p>
+                    <h6>学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925</h6>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <div class="row clearfix">
-    <div class="col-md-4 column">
-    </div>
     <div class="col-md-4 column">
         <ul class="pager">
             <li class="previous"><a href="#">&larr; 上一页</a></li>
