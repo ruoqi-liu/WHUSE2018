@@ -15,7 +15,8 @@ var userInfoRouter = require('./routes/userinfo');
 var postRouter = require('./routes/post');
 var userPostRouter = require('./routes/userpost');
 var userTagsRouter = require('./routes/usertags');
-
+var newsRouter = require('./routes/news');
+var tagsRouter = require('./routes/tags');
 var app = express();
 
 // view engine setup
@@ -47,7 +48,8 @@ app.use('/userinfo',userInfoRouter);
 app.use('/posts', postRouter);
 app.use('/userpost', userPostRouter);
 app.use('/usertags',userTagsRouter);
-
+app.use('/news',newsRouter);
+app.use('/tags',tagsRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     console.log(req.method);

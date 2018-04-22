@@ -6,13 +6,13 @@ var db = monk('localhost:27017/WHUSE');
 var collection = db.get('user');
 var postCollection = db.get('post');
 
-passport.serializeUser(function (user, done) {//Ğ´Èësession,done ¾ÍÊÇÒ»¸öÖĞ¼ä¼ş£¬½ÓÊÜË³ĞòÎªerr,user,info²¢½«ËûÃÇĞ´Èësession
+passport.serializeUser(function (user, done) {//åºåˆ—åŒ–sessionå†…å®¹,done æ˜¯ä¸€ä¸ªä¸­é—´ä»¶ï¼Œæ¥å—é¡ºåºä¸ºerr,user,infoå¹¶å°†åšç›¸åº”çš„å¤„ç†
     console.log('serializing.');
     done(null, user);
 }
 );
 
-passport.deserializeUser(function (user, done) {//Ğ´Èësession
+passport.deserializeUser(function (user, done) {//ååºåˆ—åŒ–ï¼Œå†™å…¥session
     console.log('deseralizing');
     done(null, user);
 }
@@ -23,7 +23,7 @@ passport.use('logIn', new LocalStrategy(
         usernameField: 'name',
         passwordField: 'password',
         passReqToCallback: false
-    }, function (username, password, done) {//ÉèÖÃÎªtrueÖ®ºóµÚÒ»¸ö²ÎÊı»á½«req´«Èë    
+    }, function (username, password, done) {//è®¾ç½®ä¸ºtrueä¹‹åç¬¬ä¸€ä¸ªå‚æ•°ä¼šå°†reqä¼ å…¥    
         if (!username || !password)
             done(null, false, { 'valid': '0', message: 'username or password cannot be null.' });
 
@@ -84,7 +84,7 @@ var userLogout = function (req, res, next) {
 
 var userNameVerify = function (req, res, next) {
     var user = req.session.passport.user;
-    var name = req.params.name;//name Ó¦¸Ã²»»áÊÇnull,ÒòÎªÔÚurl pathÖĞ
+    var name = req.params.name;//name åº”è¯¥ä¸ä¼šæ˜¯null,å› ä¸ºåœ¨url pathä¸­
     if (!name || name != user.username) return res.send({ 'tologin': '1','message':'incorrespond username' });
     return next();
 }
