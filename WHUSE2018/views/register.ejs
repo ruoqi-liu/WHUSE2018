@@ -72,6 +72,7 @@
                             console.log("请求成功", res);
                             if(res.data.isregister === "1"){
                                 alert("注册成功");
+                                window.location.href="http://localhost:3001/";
                             }
                             else {
                                 alert("注册失败："+ res.data.message);
@@ -81,19 +82,50 @@
                 }}
         ])
 
+
         $(document).ready(function(){
             $('#logIn').click(function(){
                 $('#loginModal').modal('show');
             });
         });
+
+        var loginApp = angular.module("loginApp", []);
+        loginApp.controller("loginCtrl",["$scope", "$http",
+            function($scope, $http) {
+                $scope.login = function(){
+                    var oError = document.getElementById("error_box2");
+                    var isError = false;
+                    if ($("#loginuser").val().length == 0) {
+                        oError.innerHTML = "用户名不能为空！";
+                        isError = true;
+                        return;
+                    }
+                    $http({
+                        method: 'post',
+                        url: '/user/login',
+                        data: {
+                            name: document.getElementById("loginuser").value,
+                            password: document.getElementById("loginpassword").value
+                        }
+                    }).then(
+                        function success(res) {
+                            console.log("请求成功", res);
+                            if(res.data.islogin === "1"){
+                                alert("登录成功");
+                                window.location.href="http://localhost:3001/";
+                            }
+                            else {
+                                alert("登录失败："+ res.data.message);
+                            }
+                        }
+                    )
+                }}
+        ])
     </script>
 </head>
 
 <body>
-<!-- 主页的登录按钮 -->
-<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#loginModal">
-    登录
-</button>
+
 <!-- 登录模态框 -->
 <div id="loginModal" class="modal fade">
     <div class="modal-dialog" style="width: 400px;">
@@ -119,9 +151,9 @@
                     </div>
                     <p id="error_box1"><br></p>
                     <a href="" data-toggle="modal" data-dismiss="modal" data-target="#registerModal">忘记密码</a>
-                    <div class="text-right">
+                    <div class="text-right" ng-app = "loginApp" ng-controller = "loginCtrl">
                         <button class="btn btn-default" data-toggle="modal" data-dismiss="modal" data-target="#registerModal">注册</button>
-                        <button class="btn btn-primary" type="button" id="login">登录</button>
+                        <button class="btn btn-primary" type="button" id="login" ng-click = "login()">登录</button>
                     </div>
                 </form>
             </div>
