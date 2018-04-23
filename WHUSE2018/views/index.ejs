@@ -5,49 +5,101 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <meta name="description" content="">
-    <meta name="author" content="">
 
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="icon" href="../../favicon.ico">
-    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
+    <title>主页</title>
+
+    <link rel="stylesheet" type="text/css" href="../public/stylesheets/style.css">
     <link rel="stylesheet" href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css">
-    <link link rel="stylesheet" type="text/css" href="../public/stylesheets/style.css">
-    <title>Home Page</title>
-
-    <!-- Bootstrap core CSS -->
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="starter-template.css" rel="stylesheet">
-
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
-
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script type="text/javascript" src="/public/js/access.js"></script>
     <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+
+    <style>
+        .newsFrame{
+            padding: 20px;
+            border-radius:15px;
+            border:1px solid rgb(167,167,167);
+        }
+
+        .leftLabel-blue{
+            margin-bottom: 20px;
+            border-left: 10px solid cornflowerblue;
+        }
+
+        .img-offset{
+            margin: 10px 20px;
+        }
+
+        .news-content-font{
+            color: gray;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .icon-color{
+            color:dodgerblue;
+        }
+    </style>
+
     <script>
-        $(document).ready(function(){
-            $('#login').click(function(){
-                $('#loginModal').modal('show');
-            });
-        });
+        function showNewsContent(id, color, image, title, time, content, newsLink){
+            let html =
+                "<div class = " + color + ">" +
+                "<div class = 'row clearfix'>" +
+                "<div class = 'col-md-3 column'>" +
+                "<img src = " + image + " class = 'img-thumbnail img-offset'>" +
+                "</div>" +
+                "<div class = 'col-md-8 column'>" +
+                "<h5>" + title + "</h5>" +
+                "<h6>&nbsp;" + time + "</h6>" +
+                "<p class = 'news-content-font'>" + content + "</p>" +
+                "</div>" +
+                "<div class = 'col-md-1 column'>" +
+                "<a href = " + newsLink + ">" +
+                "<span class = 'fa fa-angle-double-right icon-color fa-2x'></span>" +
+                "</a>" +
+                "</div>" +
+                "</div>"
+            document.getElementById(id).innerHTML = html;
+            document.getElementById(id).style.display = "block";
+        };
+
+        $(document).ready(function () {
+            showNewsContent('news-content-1',
+            'leftLabel-blue',
+                '/images/0001.jpg',
+                '【珞珈讲坛】萱萱院士谈现代宇宙学',
+                '  03/01/2018',
+            '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+            '                    这是一个默认的引用实例。这是一个默认的引用实例。',
+                '/lost');
+            showNewsContent('news-content-2',
+            'leftLabel-blue',
+            '/images/0001.jpg',
+            '【珞珈讲坛】萱萱院士谈现代宇宙学',
+            '  03/01/2018',
+            '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+            '                    这是一个默认的引用实例。这是一个默认的引用实例。',
+            '/lost');
+            showNewsContent('news-content-3',
+            'leftLabel-blue',
+            '/images/0001.jpg',
+            '【珞珈讲坛】萱萱院士谈现代宇宙学',
+            '  03/01/2018',
+            '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+            '                    这是一个默认的引用实例。这是一个默认的引用实例。',
+            '/lost');
+        })
     </script>
-    <script>
-        $(document).ready(function(){
-            $('#register').click(function(){
-                $('#registerModal').modal('show');
-            });
-        });
-    </script>
-    <![endif]-->
 </head>
 
 <body>
@@ -56,27 +108,18 @@
     <div class="row clearfix">
         <div class="col-md-12 column">
             <nav class="navbar navbar-default" role="navigation">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span><span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button> <a class="navbar-brand" href="#">
-                        <i class="fa fa-smile-o" aria-hidden="true"></i>
-                        <!--<span class="glyphicon glyphicon-leaf"></span>-->
-                        iManager</a>
-                </div>
-
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <!--Logo,跳转到首页-->
+                <div class="col-md-4 navbar-header">
+                    <a class = "navbar-brand fa fa-smile-o fa-lg" href="/">&nbsp iManager</a>
+                    <!--页面导航，返回主页或者跳到失物招领页，首页即为当前页面-->
                     <ul class="nav navbar-nav">
-                        <li class="active">
-                            <a href="#">主页</a>
-                        </li>
-                        <li>
-                            <a href="#">失物招领</a>
-                        </li>
+                        <li class="active"><a href="/">返回主页</a></li>
+                        <li><a href="/lost">失物招领</a></li>
                     </ul>
-
+                </div>
+                <!--页面功能导航-->
+                <div class="col-md-8">
+                    <!--登录相关按钮-->
                     <ul class = "nav navbar-nav navbar-right">
                         <li style = "display: block" id = "login"  data-toggle="modal" data-target="#loginModal"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
                         <li style = "display: block" id = "register" data-toggle="modal" data-target="#registerModal"><a><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
@@ -84,174 +127,45 @@
                         <li style = "display: none" id = "quit"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
                     </ul>
                 </div>
-
             </nav>
         </div>
     </div>
-
     <div class="row clearfix">
-        <div class="col-md-2 column">
-        </div>
-        <div class="col-md-8 column">
-
+        <div class="col-md-offset-2 col-md-8">
+            <!--日期、天气信息,给用户打个招呼-->
             <div class="row clearfix" style="margin-bottom: 15px;">
-                <div class="col-md-7 column" style="text-align:left;">
-                    <h4>18:42 星期五 3月23日 &nbsp; <span class="glyphicon glyphicon-tint"></span></h4>
-                    <!--<i class="fa fa-thermometer-2 " aria-hidden="true"></i>-->
-                </div>
-                <div class="col-md-5 column" style="text-align:right;">
+                <div class="col-md-7 column">
+                    <h4>18:42 星期五 3月23日 &nbsp;</h4>
                 </div>
             </div>
 
-
-            <div class="content" id="content" style="border-radius:15px; border:1px solid rgb(167,167,167); padding: 20px;">
-
-                <div  style="border-left: 10px solid #00B7FF;margin-bottom: 20px;">
-                    <!--test in another way-->
-                    <div class="row clearfix">
-                        <div class="col-md-3 column">
-                            <img src="/images/dept_cs.jpg" class="img-thumbnail" style="margin: 10px 20px;"/>
-                        </div>
-                        <div class="col-md-8 column">
-                            <h5>【珞珈讲坛】萱萱院士谈现代宇宙学</h5>
-                            <h6>&nbsp; 03/01/2018</h6>
-                            <p style="font-size: 12px; color: gray; margin-left: 5px;">
-                                这是一个默认的引用实例。这是一个默认的引用实例。
-                                这是一个默认的引用实例。这是一个默认的引用实例。<br>
-                                这是一个默认的引用实例。这是一个默认的引用实例。
-                                这是一个默认的引用实例。这是一个默认的引用实例。</p>
-                        </div>
-                        <div class="col-md-1 column">
-                            <br>
-                            <br>
-                            <a href="#">
-                                <span class="glyphicon glyphicon-chevron-right"></span>
-                                <!--<i class="fa fa-chevron-right" aria-hidden="true"></i>-->
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div  style="border-left: 10px solid #dd514c;margin-bottom: 20px;">
-                    <!--test in another way-->
-                    <div class="row clearfix">
-                        <div class="col-md-3 column">
-                            <img src="/images/dept_cs.jpg" class="img-thumbnail" style="margin: 10px 20px;"/>
-                        </div>
-                        <div class="col-md-8 column">
-                            <h5>【珞珈讲坛】萱萱院士谈现代宇宙学</h5>
-                            <h6>&nbsp; 03/01/2018</h6>
-                            <p style="font-size: 12px; color: gray; margin-left: 5px;">
-                                这是一个默认的引用实例。这是一个默认的引用实例。
-                                这是一个默认的引用实例。这是一个默认的引用实例。<br>
-                                这是一个默认的引用实例。这是一个默认的引用实例。
-                                这是一个默认的引用实例。这是一个默认的引用实例。</p>
-                        </div>
-                        <div class="col-md-1 column">
-                            <br>
-                            <br>
-                            <a href="#">
-                                <span class="glyphicon glyphicon-chevron-right"></span>
-                                <!--<i class="fa fa-chevron-right" aria-hidden="true"></i>-->
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div  style="border-left: 10px solid #f3d23b;margin-bottom: 20px;">
-                    <!--test in another way-->
-                    <div class="row clearfix">
-                        <div class="col-md-3 column">
-                            <img src="/images/dept_cs.jpg" class="img-thumbnail" style="margin: 10px 20px;"/>
-                        </div>
-                        <div class="col-md-8 column">
-                            <h5>【珞珈讲坛】萱萱院士谈现代宇宙学</h5>
-                            <h6>&nbsp; 03/01/2018</h6>
-                            <p style="font-size: 12px; color: gray; margin-left: 5px;">
-                                这是一个默认的引用实例。这是一个默认的引用实例。
-                                这是一个默认的引用实例。这是一个默认的引用实例。<br>
-                                这是一个默认的引用实例。这是一个默认的引用实例。
-                                这是一个默认的引用实例。这是一个默认的引用实例。</p>
-                        </div>
-                        <div class="col-md-1 column">
-                            <br>
-                            <br>
-                            <a href="#">
-                                <span class="glyphicon glyphicon-chevron-right"></span>
-                                <!--<i class="fa fa-chevron-right" aria-hidden="true"></i>-->
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div  style="border-left: 10px solid #00B7FF;margin-bottom: 20px;">
-                    <!--test in another way-->
-                    <div class="row clearfix">
-                        <div class="col-md-3 column">
-                            <img src="/images/dept_cs.jpg" class="img-thumbnail" style="margin: 10px 20px;"/>
-                        </div>
-                        <div class="col-md-8 column">
-                            <h5>【珞珈讲坛】萱萱院士谈现代宇宙学</h5>
-                            <h6>&nbsp; 03/01/2018</h6>
-                            <p style="font-size: 12px; color: gray; margin-left: 5px;">
-                                这是一个默认的引用实例。这是一个默认的引用实例。
-                                这是一个默认的引用实例。这是一个默认的引用实例。<br>
-                                这是一个默认的引用实例。这是一个默认的引用实例。
-                                这是一个默认的引用实例。这是一个默认的引用实例。</p>
-                        </div>
-                        <div class="col-md-1 column">
-                            <br>
-                            <br>
-                            <a href="#">
-                                <span class="glyphicon glyphicon-chevron-right"></span>
-                                <!--<i class="fa fa-chevron-right" aria-hidden="true"></i>-->
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div  style="border-left: 10px solid #f3d23b; margin-bottom: 20px; ">
-                    <!--test in another way-->
-                    <div class="row clearfix">
-                        <div class="col-md-3 column">
-                            <img src="/images/dept_cs.jpg" class="img-thumbnail" style="margin: 10px 20px;"/>
-                        </div>
-                        <div class="col-md-8 column">
-                            <h5>【珞珈讲坛】萱萱院士谈现代宇宙学</h5>
-                            <h6>&nbsp; 03/01/2018</h6>
-                            <p style="font-size: 12px; color: gray; margin-left: 5px;">
-                                这是一个默认的引用实例。这是一个默认的引用实例。
-                                这是一个默认的引用实例。这是一个默认的引用实例。<br>
-                                这是一个默认的引用实例。这是一个默认的引用实例。
-                                这是一个默认的引用实例。这是一个默认的引用实例。</p>
-                        </div>
-                        <div class="col-md-1 column">
-                            <br>
-                            <br>
-                            <a href="#">
-                                <span class="glyphicon glyphicon-chevron-right"></span>
-                                <!--<i class="fa fa-chevron-right" aria-hidden="true"></i>-->
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
+            <div class="content newsFrame" id="news-content-1" style="display: none">
             </div>
-
-            <div class="col-md-2 column">
+            &nbsp;
+            <div class="content newsFrame" id="news-content-2" style="display: none">
             </div>
+            &nbsp;
+            <div class="content newsFrame" id="news-content-3" style="display: none">
+            </div>
+        </div>
+    </div>
+    &nbsp;
+    <div class="row clearfix">
+        <div class="col-md-4 column">
+        </div>
+        <div class="col-md-4 column">
+            <ul class="pager">
+                <li class="previous"><a href="#">&larr; 上一页</a></li>
+                <li class="next"><a href="#">下一页 &rarr;</a></li>
+            </ul>
+        </div>
+        <div class="col-md-4 column">
         </div>
     </div>
 </div>
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
 <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+
 </body>
 </html>
-
