@@ -6,13 +6,13 @@ var db = monk('localhost:27017/WHUSE');
 var collection = db.get('user');
 var postCollection = db.get('post');
 
-passport.serializeUser(function (user, done) {//序列化session内容,done 是一个中间件，接受顺序为err,user,info并将做相应的处理
+passport.serializeUser(function (user, done) {//序列化,done 是一个中间件，接受顺序为err,user,info并将做相应的处理
     console.log('serializing.');
     done(null, user);
 }
 );
 
-passport.deserializeUser(function (user, done) {//反序列化，写入session
+passport.deserializeUser(function (user, done) {//反序列化，写req
     console.log('deseralizing');
     done(null, user);
 }
