@@ -1,4 +1,3 @@
-<%- include register.ejs %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -33,20 +32,6 @@
     <!--[if lt IE 9]>
     <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-    <script>
-        $(document).ready(function(){
-            $('#login').click(function(){
-                $('#loginModal').modal('show');
-            });
-        });
-    </script>
-    <script>
-        $(document).ready(function(){
-            $('#register').click(function(){
-                $('#registerModal').modal('show');
-            });
-        });
-    </script>
     <![endif]-->
 </head>
 
@@ -77,11 +62,11 @@
                         </li>
                     </ul>
 
-                    <ul class = "nav navbar-nav navbar-right">
-                        <li style = "display: block" id = "login"  data-toggle="modal" data-target="#loginModal"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
-                        <li style = "display: block" id = "register" data-toggle="modal" data-target="#registerModal"><a><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
-                        <li style = "display: none" id = "user"><a><span class = "fa fa-user">&nbsp&nbsp用户</span></a></li>
-                        <li style = "display: none" id = "quit"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <!--<a href="#"><span class="glyphicon glyphicon-user"></span>&nbsp; 萱萱</a>-->
+                            <a href="#"><i class="fa fa-user-circle-o" aria-hidden="true"></i>&nbsp; 萱萱</a>
+                        </li>
                     </ul>
                 </div>
 
@@ -93,13 +78,18 @@
         <div class="col-md-2 column">
         </div>
         <div class="col-md-8 column">
-
+            <div class="temp-date">
+                <h4>Hi,萱萱</h4>
+            </div>
             <div class="row clearfix" style="margin-bottom: 15px;">
                 <div class="col-md-7 column" style="text-align:left;">
                     <h4>18:42 星期五 3月23日 &nbsp; <span class="glyphicon glyphicon-tint"></span></h4>
                     <!--<i class="fa fa-thermometer-2 " aria-hidden="true"></i>-->
                 </div>
                 <div class="col-md-5 column" style="text-align:right;">
+                    <button type="button" class="btn btn-danger">奖学金</button>
+                    <button type="button" class="btn btn-warning">出国交流</button>
+                    <button type="button" class="btn btn-info">名人讲座</button>
                 </div>
             </div>
 
