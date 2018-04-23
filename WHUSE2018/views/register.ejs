@@ -26,8 +26,8 @@
     </style>
 
     <script>
-        var registerApp = angular.module("registerApp", []);
-        registerApp.controller("registerCtrl",["$scope", "$http",
+        var register = angular.module("register", []);
+        register.controller("registerCtrl",["$scope", "$http",
             function($scope, $http) {
                 $scope.register = function(){
                     var oError = document.getElementById("error_box2");
@@ -72,7 +72,7 @@
                             console.log("请求成功", res);
                             if(res.data.isregister === "1"){
                                 alert("注册成功");
-                                window.location.href="visit.ejs";
+                                window.location.href = "/visit";
                             }
                             else {
                                 alert("注册失败："+ res.data.message);
@@ -82,15 +82,14 @@
                 }}
         ])
 
-
         $(document).ready(function(){
             $('#logIn').click(function(){
                 $('#loginModal').modal('show');
             });
         });
 
-        var loginApp = angular.module("loginApp", []);
-        loginApp.controller("loginCtrl",["$scope", "$http",
+        var login = angular.module("login", []);
+        login.controller("loginCtrl",["$scope", "$http",
             function($scope, $http) {
                 $scope.login = function(){
                     var oError = document.getElementById("error_box2");
@@ -112,7 +111,7 @@
                             console.log("请求成功", res);
                             if(res.data.islogin === "1"){
                                 alert("登录成功");
-                                window.location.href="visit.ejs";
+                                window.location.href="/visit";
                             }
                             else {
                                 alert("登录失败："+ res.data.message);
@@ -121,15 +120,16 @@
                     )
                 }}
         ])
+
+        angular.module('loginApp', ['register', 'login']);
     </script>
 </head>
 
-<body>
-
+<body ng-app="loginApp">
 <!-- 登录模态框 -->
 <div id="loginModal" class="modal fade">
     <div class="modal-dialog" style="width: 400px;">
-        <div class="modal-content">
+        <div class="modal-content" ng-controller="loginCtrl">
             <div class="modal-body">
                 <button class="close" data-dismiss="modal">
                     <span>&times;</span>
@@ -151,9 +151,9 @@
                     </div>
                     <p id="error_box1"><br></p>
                     <a href="" data-toggle="modal" data-dismiss="modal" data-target="#registerModal">忘记密码</a>
-                    <div class="text-right" ng-app = "loginApp" ng-controller = "loginCtrl">
+                    <div class="text-right">
                         <button class="btn btn-default" data-toggle="modal" data-dismiss="modal" data-target="#registerModal">注册</button>
-                        <button class="btn btn-primary" type="button" id="login" ng-click = "login()">登录</button>
+                        <button class="btn btn-primary" type="button" id="login" ng-click="login()">登录</button>
                     </div>
                 </form>
             </div>
@@ -164,7 +164,7 @@
 <!-- 注册模态框 -->
 <div id="registerModal" class="modal fade">
     <div class="modal-dialog" style="width: 400px;">
-        <div class="modal-content">
+        <div class="modal-content" ng-controller = "registerCtrl">
             <div class="modal-body">
                 <button class="close" data-dismiss="modal">
                     <span>&times;</span>
@@ -192,7 +192,7 @@
                         <input type="password" class="form-control" id="repeatPassword" name="password" placeholder="请再次输入密码">
                     </div>
                     <p id="error_box2"><br></p>
-                    <div class="text-right" ng-app = "registerApp" ng-controller = "registerCtrl">
+                    <div class="text-right">
                         <button class="btn btn-default" data-toggle="modal" data-dismiss="modal" data-target="#loginModal">去登录</button>
                         <button class="btn btn-primary" type="button" id="register" ng-click = "register()">注册</button>
                     </div>
