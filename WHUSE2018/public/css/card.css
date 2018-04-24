@@ -1,0 +1,25 @@
+/*信息卡片的边框*/
+.card-frame {
+    padding: 20px;
+    border-radius:15px;
+    border:1px solid rgb(167,167,167);
+}
+/*配图的边框间距*/
+.card-image-margin{
+    margin: 10px 20px;
+}
+/*文本字体样式*/
+.card-content-font{
+    color: gray;
+    font-size: 12px;
+    margin-left: 5px;
+}
+/*外链跳转图标的颜色*/
+.card-href-color{
+    color:dodgerblue;
+}
+/*信息类别对应的标签样式，区别在于颜色*/
+.card-label-color-blue{
+    margin-bottom: 20px;
+    border-left: 10px solid cornflowerblue;
+}

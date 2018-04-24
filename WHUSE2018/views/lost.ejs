@@ -7,69 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     <title>失物招领</title>
+    <link rel="stylesheet" href="/css/contentCard.css">
+    <link rel="stylesheet" href="/css/uploadFileBtn.css">
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
-    <style>
-        .a-upload {
-            padding: 4px 10px;
-            line-height: 20px;
-            position: relative;
-            cursor: pointer;
-            color: #888;
-            background: #fafafa;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-            display: inline-block;
-            *display: inline;
-            *zoom: 1
-        }
-
-        .a-upload  input {
-            position: absolute;
-            font-size: 50px;
-            right: 0;
-            top: 0;
-            opacity: 0;
-            filter: alpha(opacity=0);
-            cursor: pointer
-        }
-
-        .a-upload:hover {
-            color: #444;
-            background: #eee;
-            border-color: #ccc;
-            text-decoration: none
-        }
-
-        .newsFrame{
-            padding: 20px;
-            border-radius:15px;
-            border:1px solid rgb(167,167,167);
-        }
-
-        .leftLabel-blue{
-            margin-bottom: 20px;
-            border-left: 10px solid cornflowerblue;
-        }
-
-        .img-offset{
-            margin: 10px 20px;
-        }
-
-        .news-content-font{
-            color: gray;
-            font-size: 12px;
-            margin-left: 5px;
-        }
-
-        .icon-color{
-            color:dodgerblue;
-        }
-    </style>
 
     <script>
         //发布信息，并在发布之前检查发布信息时，提交的表单是否填写完全
@@ -126,28 +70,12 @@
                 }
             }])
 
-        //根据传入的参数，构造失物招领信息卡片
-        function showLostContent(id, color, image, title, time, content){
-            let html =
-                "<div class = " + color + ">" +
-                "<div class = 'row clearfix'>" +
-                "<div class = 'col-md-3 column'>" +
-                "<img src = " + image + " class = 'img-thumbnail img-offset'>" +
-                "</div>" +
-                "<div class = 'col-md-8 column'>" +
-                "<h5>" + title + "</h5>" +
-                "<h6>&nbsp;" + time + "</h6>" +
-                "<p class = 'news-content-font'>" + content + "</p>" +
-                "</div>" +
-                "</div>"
-            document.getElementById(id).innerHTML = html;
-            document.getElementById(id).style.display = "block";
-        };
+
 
         $(document).ready(function () {
-            showLostContent("lost-content-1", "leftLabel-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
-            showLostContent("lost-content-2", "leftLabel-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
-            showLostContent("lost-content-3", "leftLabel-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
+            showLostContent("lost-content-1", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
+            showLostContent("lost-content-2", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
+            showLostContent("lost-content-3", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
         })
 
         let searchApp = angular.module("searchApp", []);
@@ -312,13 +240,13 @@
                 </div>
             </div>
 
-            <div class="content newsFrame" id="lost-content-1" style="display: none">
+            <div class="content card-frame" id="lost-content-1" style="display: none">
             </div>
             &nbsp;
-            <div class="content newsFrame" id="lost-content-2" style="display: none">
+            <div class="content card-frame" id="lost-content-2" style="display: none">
             </div>
             &nbsp;
-            <div class="content newsFrame" id="lost-content-3" style="display: none">
+            <div class="content card-frame" id="lost-content-3" style="display: none">
             </div>
         </div>
     </div>

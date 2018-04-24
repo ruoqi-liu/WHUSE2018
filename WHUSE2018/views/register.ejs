@@ -5,24 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
+    <link rel="stylesheet" href="/css/login.css">
     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <style type="text/css">
-        p {font-size: 80%}
-        .btn-primary {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-success:hover {
-            background-color: #3e8e41;
-        }
-    </style>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
         var register = angular.module("register", []);
@@ -71,7 +58,8 @@
                             console.log("请求成功", res);
                             if(res.data.isregister === "1"){
                                 alert("注册成功");
-                                window.location.href = "/visit";
+                                let userName = res.data.username;
+                                window.location.href = "/?login=true&username=" + userName;
                             }
                             else {
                                 alert("注册失败："+ res.data.message);
@@ -110,7 +98,7 @@
                             console.log("请求成功", res);
                             if(res.data.islogin === "1"){
                                 alert("登录成功");
-                                window.location.href="/visit";
+                                window.location.href="/";
                             }
                             else {
                                 alert("登录失败："+ res.data.message);

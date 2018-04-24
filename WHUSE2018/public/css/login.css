@@ -1,0 +1,16 @@
+p {
+    font-size: 80%
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-success:hover {
+    background-color: #3e8e41;
+}

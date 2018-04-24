@@ -1,18 +1,18 @@
 //界面按钮的切换，登录前显示 “登录”“注册”按钮，登录后显示“用户”“退出”按钮
 function loginBtn(choice) {
     if(choice === "hidden"){
-        document.getElementById("user").style.display = "block";
-        document.getElementById("quit").style.display = "block";
+        document.getElementById("userBtn").style.display = "block";
+        document.getElementById("quitBtn").style.display = "block";
 
-        document.getElementById("login").style.display = "none";
-        document.getElementById("register").style.display = "none";
+        document.getElementById("loginBtn").style.display = "none";
+        document.getElementById("registerBtn").style.display = "none";
     }
     else if(choice === "show"){
-        document.getElementById("user").style.display = "none";
-        document.getElementById("quit").style.display = "none";
+        document.getElementById("userBtn").style.display = "none";
+        document.getElementById("quitBtn").style.display = "none";
 
-        document.getElementById("login").style.display = "block";
-        document.getElementById("register").style.display = "block";
+        document.getElementById("loginBtn").style.display = "block";
+        document.getElementById("registerBtn").style.display = "block";
     }
 }
 

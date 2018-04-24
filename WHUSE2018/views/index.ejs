@@ -6,98 +6,69 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>主页</title>
+    <title>信息主页</title>
 
-    <link rel="stylesheet" type="text/css" href="../public/stylesheets/style.css">
-    <link rel="stylesheet" href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="/css/card.css">
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <script type="text/javascript" src="/public/js/access.js"></script>
+    <script type="text/javascript" src="/js/access.js"></script>
+    <script type="text/javascript" src="/js/displayEffect.js"></script>
+    <script type="text/javascript" src="/js/dynamicLoading.js"></script>
     <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
     <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 
-    <style>
-        .newsFrame{
-            padding: 20px;
-            border-radius:15px;
-            border:1px solid rgb(167,167,167);
-        }
-
-        .leftLabel-blue{
-            margin-bottom: 20px;
-            border-left: 10px solid cornflowerblue;
-        }
-
-        .img-offset{
-            margin: 10px 20px;
-        }
-
-        .news-content-font{
-            color: gray;
-            font-size: 12px;
-            margin-left: 5px;
-        }
-
-        .icon-color{
-            color:dodgerblue;
-        }
-    </style>
-
     <script>
-        function showNewsContent(id, color, image, title, time, content, newsLink){
-            let html =
-                "<div class = " + color + ">" +
-                "<div class = 'row clearfix'>" +
-                "<div class = 'col-md-3 column'>" +
-                "<img src = " + image + " class = 'img-thumbnail img-offset'>" +
-                "</div>" +
-                "<div class = 'col-md-8 column'>" +
-                "<h5>" + title + "</h5>" +
-                "<h6>&nbsp;" + time + "</h6>" +
-                "<p class = 'news-content-font'>" + content + "</p>" +
-                "</div>" +
-                "<div class = 'col-md-1 column'>" +
-                "<a href = " + newsLink + ">" +
-                "<span class = 'fa fa-angle-double-right icon-color fa-2x'></span>" +
-                "</a>" +
-                "</div>" +
-                "</div>"
-            document.getElementById(id).innerHTML = html;
-            document.getElementById(id).style.display = "block";
-        };
-
+        //页面打开时自动加载需要显示的内容
         $(document).ready(function () {
             showNewsContent('news-content-1',
-            'leftLabel-blue',
+                'card-label-color-blue',
                 '/images/0001.jpg',
                 '【珞珈讲坛】萱萱院士谈现代宇宙学',
                 '  03/01/2018',
-            '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-            '                    这是一个默认的引用实例。这是一个默认的引用实例。',
+                '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+                '                    这是一个默认的引用实例。这是一个默认的引用实例。',
                 '/lost');
             showNewsContent('news-content-2',
-            'leftLabel-blue',
-            '/images/0001.jpg',
-            '【珞珈讲坛】萱萱院士谈现代宇宙学',
-            '  03/01/2018',
-            '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-            '                    这是一个默认的引用实例。这是一个默认的引用实例。',
-            '/lost');
+                'card-label-color-blue',
+                '/images/0001.jpg',
+                '【珞珈讲坛】萱萱院士谈现代宇宙学',
+                '  03/01/2018',
+                '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+                '                    这是一个默认的引用实例。这是一个默认的引用实例。',
+                '/lost');
             showNewsContent('news-content-3',
-            'leftLabel-blue',
-            '/images/0001.jpg',
-            '【珞珈讲坛】萱萱院士谈现代宇宙学',
-            '  03/01/2018',
-            '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-            '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-            '                    这是一个默认的引用实例。这是一个默认的引用实例。',
-            '/lost');
+                'card-label-color-blue',
+                '/images/0001.jpg',
+                '【珞珈讲坛】萱萱院士谈现代宇宙学',
+                '  03/01/2018',
+                '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
+                '                    这是一个默认的引用实例。这是一个默认的引用实例。',
+                '/lost');
+            let curLink = window.location.href;
+            let urls = curLink.split("?");
+            if(urls[0] !== curLink){
+                let args = urls[1].split("&");
+                let arg = args[0].split("=");
+                if(arg[1] === "true"){
+                    arg = args[1].split("=");
+                    loginBtn("hidden");
+                    showUserName(arg[1]);
+                }
+                else{
+                    loginBtn("show");
+                }
+            }
+            else{
+                loginBtn("show");
+            }
         })
     </script>
 </head>
@@ -121,10 +92,10 @@
                 <div class="col-md-8">
                     <!--登录相关按钮-->
                     <ul class = "nav navbar-nav navbar-right">
-                        <li style = "display: block" id = "login"  data-toggle="modal" data-target="#loginModal"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
-                        <li style = "display: block" id = "register" data-toggle="modal" data-target="#registerModal"><a><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
-                        <li style = "display: none" id = "user"><a><span class = "fa fa-user">&nbsp&nbsp用户</span></a></li>
-                        <li style = "display: none" id = "quit"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
+                        <li id = "loginBtn" data-toggle="modal" data-target="#loginModal"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
+                        <li id = "registerBtn" data-toggle="modal" data-target="#registerModal"><a><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
+                        <li style = "display: none" id = "userBtn"><a><span id = "userName" class = "fa fa-user"></span></a></li>
+                        <li style = "display: none" id = "quitBtn" ><a href = "/"><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
                     </ul>
                 </div>
             </nav>
@@ -137,15 +108,17 @@
                 <div class="col-md-7 column">
                     <h4>18:42 星期五 3月23日 &nbsp;</h4>
                 </div>
+                <div id = "tags" class="col-md-5 column" style="text-align:right; display:none;">
+                </div>
             </div>
 
-            <div class="content newsFrame" id="news-content-1" style="display: none">
+            <div class="content card-frame" id="news-content-1" style="display: none">
             </div>
             &nbsp;
-            <div class="content newsFrame" id="news-content-2" style="display: none">
+            <div class="content card-frame" id="news-content-2" style="display: none">
             </div>
             &nbsp;
-            <div class="content newsFrame" id="news-content-3" style="display: none">
+            <div class="content card-frame" id="news-content-3" style="display: none">
             </div>
         </div>
     </div>
@@ -155,8 +128,8 @@
         </div>
         <div class="col-md-4 column">
             <ul class="pager">
-                <li class="previous"><a href="#">&larr; 上一页</a></li>
-                <li class="next"><a href="#">下一页 &rarr;</a></li>
+                <li class="previous"><a href="">&larr; 上一页</a></li>
+                <li class="next"><a href="">下一页 &rarr;</a></li>
             </ul>
         </div>
         <div class="col-md-4 column">
