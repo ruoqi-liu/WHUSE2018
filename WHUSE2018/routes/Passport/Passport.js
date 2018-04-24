@@ -52,6 +52,7 @@ passport.use('signUp', new LocalStrategy(
     }, function (req, username, password, done) {
         if (!username || !password)
             done(null, false, { 'valid': '0', message: 'username or password cannot be null.' });
+        collection.createIndex({name:1},{unique:true});
         collection.insert({
             name: username, password: password, userinfo: { photo:'/images/0001.jpg'}}, function (err, result) {
             if (err)
