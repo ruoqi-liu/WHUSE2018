@@ -5,13 +5,13 @@ var monk = require('monk');
 var db = monk('localhost:27017/WHUSE');
 var collection = db.get('user');
 
-passport.serializeUser(function (user, done) {//Ð´Èësession,done ¾ÍÊÇÒ»¸öÖÐ¼ä¼þ£¬½ÓÊÜË³ÐòÎªerr,user,info²¢½«ËûÃÇÐ´Èësession
+passport.serializeUser(function (user, done) {//Ð´ï¿½ï¿½session,done ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ð¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½ï¿½Îªerr,user,infoï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½session
     console.log('serializing.');
     done(null, user);
 }
 );
 
-passport.deserializeUser(function (user, done) {//Ð´Èësession
+passport.deserializeUser(function (user, done) {//Ð´ï¿½ï¿½session
     console.log('deseralizing');
     done(null, user);
 }
@@ -22,7 +22,7 @@ passport.use('logIn', new LocalStrategy(
         usernameField: 'name',
         passwordField: 'password',
         passReqToCallback: false
-    }, function (username, password, done) {//ÉèÖÃÎªtrueÖ®ºóµÚÒ»¸ö²ÎÊý»á½«req´«Èë    
+    }, function (username, password, done) {//ï¿½ï¿½ï¿½ï¿½ÎªtrueÖ®ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á½«reqï¿½ï¿½ï¿½ï¿½    
         if (!username || !password)
             done(null, false, { 'valid': '0', message: 'username or password cannot be null.' });
         collection.find({ name: username, password: password }, { fields: { name: 1, password: 1 , userinfo: 1 } }, function (err, result) {
@@ -49,6 +49,7 @@ passport.use('signUp', new LocalStrategy(
     }, function (req, username, password, done) {
         if (!username || !password)
             done(null, false, { 'valid': '0', message: 'username or password cannot be null.' });
+        +        collection.createIndex({name:1},{unique:true});
         collection.insert({
             name: username, password: password, userinfo: { photo:'/images/0001.jpg'}}, function (err, result) {
             if (err)

@@ -7,18 +7,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     <title>失物招领</title>
-    <link rel="stylesheet" href="/css/contentCard.css">
-    <link rel="stylesheet" href="/css/uploadFileBtn.css">
-    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/card.css">
+    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="/css/upload.css">
+    <script type="text/javascript" src="/js/webLink.js"></script>
+    <script type="text/javascript" src="/js/displayEffect.js"></script>
+    <script type="text/javascript" src="/js/dynamicLoading.js"></script>
+
     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
         //发布信息，并在发布之前检查发布信息时，提交的表单是否填写完全
-        let publishApp = angular.module("publishApp", []);
-        publishApp.controller("publishCtrl", ["$scope", "$http",
+        var publish = angular.module("publish", []);
+        publish.controller("publishCtrl", ["$scope", "$http",
             function ($scope, $http) {
                 $scope.publish = function () {
                     let s;
@@ -65,6 +72,14 @@
                     }).then(
                         function success(res) {
                             alert(JSON.stringify(res));
+                            if(res.data.addpost === 1){
+                                alert("发布成功");
+                            }
+                            else {
+                                alert("发布失败");
+                            }
+                        },function errorCallBack(res) {
+                            alert(JSON.stringify(res));
                         }
                     )
                 }
@@ -76,47 +91,65 @@
             showLostContent("lost-content-1", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
             showLostContent("lost-content-2", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
             showLostContent("lost-content-3", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
+            let curLink = window.location.href;
+            let urls = curLink.split("?");
+            if(urls[0] !== curLink){
+                let args = urls[1].split("&");
+                let arg = args[0].split("=");
+                if(arg[1] === "true"){
+                    arg = args[1].split("=");
+                    loginBtn("hidden");
+                    showUserName(arg[1]);
+                }
+                else{
+                    loginBtn("show");
+                }
+            }
+            else{
+                loginBtn("show");
+            }
         })
 
-        let searchApp = angular.module("searchApp", []);
-        searchApp.controller("searchCtrl", ["$scope", "$http",
+        let search = angular.module("search", []);
+        search.controller("searchCtrl", ["$scope", "$http",
             function ($scope, $http) {
                 $scope.search = function () {
                     $http({
-                        method:'post',
-                        url:window.location.href,
+                        method: 'post',
+                        url: window.location.href,
                         data: {
                             text: document.getElementById("search").value
                         }
-                    })
+                    }).then(
+                        function success(res) {
+                            let resultArray = res.data.result;
+                            let curResult;
+                            curResult = resultArray[0];
+                            showInfo("info1", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                            curResult = resultArray[1];
+                            showInfo("info2", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                            curResult = resultArray[2];
+                            showInfo("info3", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                        }
+                    )
                 }
-            }]).then(
-            function success(res) {
-                let resultArray = res.data.result;
-                let curResult;
-                curResult = resultArray[0];
-                showInfo("info1", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                curResult = resultArray[1];
-                showInfo("info2", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                curResult = resultArray[2];
-                showInfo("info3", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
             }
-        )
+            ])
     </script>
 </head>
 
-<body>
+<body ng-app ="lostApp">
 <div class="container">
     <div class="row clearfix">
         <div class="col-md-12 column">
             <nav class="navbar navbar-default" role="navigation">
                 <!--Logo,跳转到首页-->
                 <div class="col-md-4 navbar-header">
-                    <a class = "navbar-brand fa fa-smile-o fa-lg" href="/">&nbsp iManager</a>
+                    <a class = "navbar-brand fa fa-smile-o fa-lg" onclick="linkto('')">&nbsp iManager</a>
                     <!--页面导航，返回主页或者跳到失物招领页，首页即为当前页面-->
                     <ul class="nav navbar-nav">
-                        <li><a href="/">返回主页</a></li>
-                        <li class="active"><a href="/lost">失物招领</a></li>
+                        <li><a onclick="linkto('/')">返回主页</a></li>
+                        <li class="active"><a onclick="linkto('/lost')">失物招领</a></li>
                     </ul>
                 </div>
                 <!--页面功能导航-->
@@ -137,8 +170,7 @@
                     <!--发布失物招领的模态框-->
                     <div class = "modal fade" id = "lostModal" tabindex = "-1" role = "dialog" aria-labelledby = "lostModalLabel" aria-hidden = "true">
                         <div class = "modal-dialog">
-                            <div class = "modal-content" ng-app="publishApp" ng-controller="publishCtrl">
-
+                            <div class = "modal-content" ng-controller="publishCtrl">
                                 <!--模态框标题，提供模态框的关闭按钮-->
                                 <div class = "modal-header">
                                     <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
@@ -214,7 +246,7 @@
 
                     <!--搜索栏，点击搜索，显示匹配的信息-->
                     <div class = "col-md-4">
-                        <div class = "input-group input-group-lg" ng-app="searchApp" ng-controller="searchCtrl">
+                        <div class = "input-group input-group-lg" ng-controller="searchCtrl">
                             <input id = "search" type = "text" class = "form-control" title="搜索">
                             <span class = "input-group-btn"><button class = "btn btn-default" type = "button" ng-click="search()">搜索</button></span>
                         </div>
@@ -222,10 +254,10 @@
 
                     <!--登录相关按钮-->
                     <ul class = "nav navbar-nav navbar-right">
-                        <li style = "display: block" id = "login"  data-toggle="modal" data-target="#loginModal"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
-                        <li style = "display: block" id = "register" data-toggle="modal" data-target="#registerModal"><a><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
-                        <li style = "display: none" id = "user"><a><span class = "fa fa-user">&nbsp&nbsp用户</span></a></li>
-                        <li style = "display: none" id = "quit"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
+                        <li id = "loginBtn" data-toggle="modal" data-target="#loginModal"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
+                        <li id = "registerBtn" data-toggle="modal" data-target="#registerModal"><a><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
+                        <li style = "display: none" id = "userBtn"><a><span id = "userName" class = "fa fa-user"></span></a></li>
+                        <li style = "display: none" id = "quitBtn" ><a href = "/"><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
                     </ul>
                 </div>
             </nav>

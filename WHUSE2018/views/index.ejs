@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <script type="text/javascript" src="/js/access.js"></script>
+    <script type="text/javascript" src="/js/webLink.js"></script>
     <script type="text/javascript" src="/js/displayEffect.js"></script>
     <script type="text/javascript" src="/js/dynamicLoading.js"></script>
     <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
@@ -81,11 +81,11 @@
             <nav class="navbar navbar-default" role="navigation">
                 <!--Logo,跳转到首页-->
                 <div class="col-md-4 navbar-header">
-                    <a class = "navbar-brand fa fa-smile-o fa-lg" href="/">&nbsp iManager</a>
+                    <a class = "navbar-brand fa fa-smile-o fa-lg" onclick="linkto('')">&nbsp iManager</a>
                     <!--页面导航，返回主页或者跳到失物招领页，首页即为当前页面-->
                     <ul class="nav navbar-nav">
-                        <li class="active"><a href="/">返回主页</a></li>
-                        <li><a href="/lost">失物招领</a></li>
+                        <li class="active"><a onclick="linkto('/')">返回主页</a></li>
+                        <li><a onclick="linkto('/lost')">失物招领</a></li>
                     </ul>
                 </div>
                 <!--页面功能导航-->
