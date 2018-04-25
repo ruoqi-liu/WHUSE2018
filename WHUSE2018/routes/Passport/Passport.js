@@ -4,14 +4,15 @@ var LocalStrategy = require('passport-local').Strategy;
 var monk = require('monk');
 var db = monk('localhost:27017/WHUSE');
 var collection = db.get('user');
+var postCollection = db.get('post');
 
-passport.serializeUser(function (user, done) {//д��session,done ����һ���м��������˳��Ϊerr,user,info��������д��session
+passport.serializeUser(function (user, done) {//序列化,done 是一个中间件，接受顺序为err,user,info并将做相应的处理
     console.log('serializing.');
     done(null, user);
 }
 );
 
-passport.deserializeUser(function (user, done) {//д��session
+passport.deserializeUser(function (user, done) {//反序列化，写req
     console.log('deseralizing');
     done(null, user);
 }
@@ -22,10 +23,12 @@ passport.use('logIn', new LocalStrategy(
         usernameField: 'name',
         passwordField: 'password',
         passReqToCallback: false
-    }, function (username, password, done) {//����Ϊtrue֮���һ�������Ὣreq����    
+    }, function (username, password, done) {//设置为true之后第一个参数会将req传入    
         if (!username || !password)
             done(null, false, { 'valid': '0', message: 'username or password cannot be null.' });
-        collection.find({ name: username, password: password }, { fields: { name: 1, password: 1 , userinfo: 1 } }, function (err, result) {
+
+        collection.find({ name: username, password: password }, {
+            fields: { name: 1, password: 1, userinfo:1 } }, function (err, result) {
             if (err) throw err;
             
             if (result)
@@ -49,7 +52,7 @@ passport.use('signUp', new LocalStrategy(
     }, function (req, username, password, done) {
         if (!username || !password)
             done(null, false, { 'valid': '0', message: 'username or password cannot be null.' });
-        +        collection.createIndex({name:1},{unique:true});
+        collection.createIndex({name:1},{unique:true});
         collection.insert({
             name: username, password: password, userinfo: { photo:'/images/0001.jpg'}}, function (err, result) {
             if (err)
@@ -80,6 +83,28 @@ var userLogout = function (req, res, next) {
     return;
 }
 
+var userNameVerify = function (req, res, next) {
+    var user = req.session.passport.user;
+    var name = req.params.name;//name 应该不会是null,因为在url path中
+    if (!name || name != user.username) return res.send({ 'tologin': '1','message':'incorrespond username' });
+    return next();
+}
+
+var postOwnerVerify = function (req, res, next) {
+    var user = req.session.passport.user;
+    var postid = req.params.postid;
+    
+    postCollection.find({ '_id': postid }, { fields: { postinfo: 1 } }).then((result) => {
+        if (result.length == 0) return res.send({ 'ispostowner': '0', message: 'incorrect postid' });
+        result = result[0];
+        var postname = result.postinfo.username;
+        if (postname != user.username) return res.send({ 'ispostowner': '0', message: 'not the owner' });
+        return next();
+    }).catch((err) => { console.log(err);});
+};
+
+exports.userNameVerify = userNameVerify;
 exports.authentic = isAuthenticated;
 exports.passport = passport;
 exports.logout = userLogout;
+exports.postOwnerVerify = postOwnerVerify;
