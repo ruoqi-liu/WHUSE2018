@@ -1,4 +1,3 @@
-<%- include register.ejs %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -11,7 +10,6 @@
     <link rel="stylesheet" href="/css/card.css">
     <link rel="stylesheet" href="/css/login.css">
     <link rel="stylesheet" href="/css/upload.css">
-    <script type="text/javascript" src="/js/webLink.js"></script>
     <script type="text/javascript" src="/js/displayEffect.js"></script>
     <script type="text/javascript" src="/js/dynamicLoading.js"></script>
 
@@ -23,6 +21,27 @@
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
+        $(function(){
+            $("#image").on("change",function () {
+                var dataURL;
+                var $file = $(this);
+                var fileObj = $file[0];
+
+                var windowURL = window.URL || window.webkitURL;
+                var $img = $("img");
+
+                if (fileObj && fileObj.files && fileObj.files[0]) {
+                    dataURL = windowURL.createObjectURL(fileObj.files[0]);
+                    $img.attr('src', dataURL);
+                } else {
+                    dataURL = $file.val();
+                    var imgObj = document.getElementById("preview");
+                    imgObj.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+                    imgObj.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = dataURL;
+                }
+            });
+        });
+
         //发布信息，并在发布之前检查发布信息时，提交的表单是否填写完全
         var publish = angular.module("publish", []);
         publish.controller("publishCtrl", ["$scope", "$http",
@@ -54,6 +73,10 @@
                         }
                     }
 
+                    let imagePath = document.getElementById("image").value;
+                    let filePath = imagePath.split("\\");
+                    let fileName = filePath[filePath.length - 1];
+
                     $http({
                         method:'post',
                         url:'/posts/add',
@@ -65,48 +88,30 @@
                                 postinfo:
                                     {
                                         date: document.getElementById("time").value,
-                                        image: document.getElementById("image").value
+                                        image:'/images/' + fileName
                                     }
                             }
                         }
                     }).then(
                         function success(res) {
-                            alert(JSON.stringify(res));
-                            if(res.data.addpost === 1){
+                            if(res.data.addpost === "1"){
                                 alert("发布成功");
+                                $("#lostModal").modal("hide");
                             }
                             else {
                                 alert("发布失败");
                             }
-                        },function errorCallBack(res) {
-                            alert(JSON.stringify(res));
                         }
                     )
                 }
             }])
 
-
-
         $(document).ready(function () {
             showLostContent("lost-content-1", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
             showLostContent("lost-content-2", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
             showLostContent("lost-content-3", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
-            let curLink = window.location.href;
-            let urls = curLink.split("?");
-            if(urls[0] !== curLink){
-                let args = urls[1].split("&");
-                let arg = args[0].split("=");
-                if(arg[1] === "true"){
-                    arg = args[1].split("=");
-                    loginBtn("hidden");
-                    showUserName(arg[1]);
-                }
-                else{
-                    loginBtn("show");
-                }
-            }
-            else{
-                loginBtn("show");
+            if(document.getElementById("userName").innerText !== "用户"){
+                loginBtn("hidden");
             }
         })
 
@@ -116,40 +121,113 @@
                 $scope.search = function () {
                     $http({
                         method: 'post',
-                        url: window.location.href,
+                        url: '/posts/search/' + document.getElementById("losttype").innerText + '/' + document.getElementById("lostpage").innerText,
                         data: {
                             text: document.getElementById("search").value
                         }
                     }).then(
                         function success(res) {
+                            document.getElementById("lost-content-1").style.visibility = "hidden";
+                            document.getElementById("lost-content-2").style.visibility = "hidden";
+                            document.getElementById("lost-content-3").style.visibility = "hidden";
                             let resultArray = res.data.result;
+                            let length = resultArray.length;
                             let curResult;
-                            curResult = resultArray[0];
-                            showInfo("info1", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                            curResult = resultArray[1];
-                            showInfo("info2", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                            curResult = resultArray[2];
-                            showInfo("info3", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                            if(length !== 0) {
+                                curResult = resultArray[0];
+                                showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                                document.getElementById("lost-content-1").style.visibility = "visible";
+                                length--;
+                            }
+
+                            if(length !== 0) {
+                                curResult = resultArray[1];
+                                showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                                document.getElementById("lost-content-2").style.visibility = "visible";
+                                length--;
+                            }
+
+                            if(length !== 0) {
+                                curResult = resultArray[2];
+                                showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                                document.getElementById("lost-content-3").style.visibility = "visible";
+                            }
+                        },
+                        function errorCallback(res) {
                         }
                     )
                 }
             }
-            ])
+            ]
+        )
+
+        let quit = angular.module('quit', []);
+        quit.controller('quitCtrl', ['$scope', '$http',
+            function ($scope, $http) {
+            $scope.quit = function () {
+                $http({
+                    method:'post',
+                    url:'/user/logout'
+                }).then(
+                    function success(res) {
+                        if(res.data.islogout === "1"){
+                            loginBtn("show")
+                        }
+                    }
+                )
+            }}
+        ])
+
+        let turn = angular.module('turn', []);
+        turn.controller('turnPageCtrl', ['$scope', '$http',
+            function ($scope, $http) {
+            $scope.upPage = function () {
+                var curPage = document.getElementById("lostpage").innerText;
+                curPage++;
+                $http({
+                    method:'get',
+                    url:'/posts/' + document.getElementById("losttype").innerText + '/' + curPage,
+                }).then(
+                    function success(res) {
+                        alert(JSON.stringify(res));
+                        document.getElementById("lostpage").innerText = curPage;
+                    }
+                )
+            }
+            $scope.downPage = function () {
+                var curPage = document.getElementById("lostpage").innerText;
+                curPage--;
+                $http({
+                    method:'get',
+                    url:'/posts/' + document.getElementById("losttype").innerText + '/' + curPage,
+                }).then(
+                    function success(res) {
+                        alert(JSON.stringify(res));
+                        document.getElementById("lostpage").innerText = curPage;
+                    }
+                )
+            }
+        }
+        ])
+
+        angular.module('lostApp', ['publish', 'search', 'quit', 'turn']);
     </script>
 </head>
 
 <body ng-app ="lostApp">
+<p id = "losttype" style="display: none"><%= type %></p>
+<p id = "lostpage" style="display: none"><%= page %></p>
 <div class="container">
     <div class="row clearfix">
         <div class="col-md-12 column">
             <nav class="navbar navbar-default" role="navigation">
                 <!--Logo,跳转到首页-->
                 <div class="col-md-4 navbar-header">
-                    <a class = "navbar-brand fa fa-smile-o fa-lg" onclick="linkto('')">&nbsp iManager</a>
+                    <a class = "navbar-brand fa fa-smile-o fa-lg" href="">&nbsp iManager</a>
                     <!--页面导航，返回主页或者跳到失物招领页，首页即为当前页面-->
                     <ul class="nav navbar-nav">
-                        <li><a onclick="linkto('/')">返回主页</a></li>
-                        <li class="active"><a onclick="linkto('/lost')">失物招领</a></li>
+                        <li><a href="/index">返回主页</a></li>
+                        <li class="active"><a href="/lost/lost/page1">失物招领</a></li>
                     </ul>
                 </div>
                 <!--页面功能导航-->
@@ -187,8 +265,8 @@
                                             <div class = "col-md-8">
                                                 <select id = infoType class = "form-control">
                                                     <option value = "">请选择</option>
-                                                    <option value = "寻找失主">寻找失主</option>
-                                                    <option value = "失物招领">失物招领</option>
+                                                    <option value = "found">寻找失主</option>
+                                                    <option value = "lost">失物招领</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -229,7 +307,8 @@
                                             <lable for = "image" class = "col-md-4 control-label fa fa-image">&nbsp&nbsp上传图片</lable>
                                             <div class = "col-md-8 input-icon-group">
                                                 <a href="javascript:" class="a-upload">
-                                                    <input type="file" name="" id="image">点击这里上传文件
+                                                    <input type="file" name="" id="image">
+                                                    <img src="" alt="在此处选择图片" height="200" width="200">
                                                 </a>
                                             </div>
                                         </div>
@@ -253,11 +332,11 @@
                     </div>
 
                     <!--登录相关按钮-->
-                    <ul class = "nav navbar-nav navbar-right">
-                        <li id = "loginBtn" data-toggle="modal" data-target="#loginModal"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
-                        <li id = "registerBtn" data-toggle="modal" data-target="#registerModal"><a><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
-                        <li style = "display: none" id = "userBtn"><a><span id = "userName" class = "fa fa-user"></span></a></li>
-                        <li style = "display: none" id = "quitBtn" ><a href = "/"><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
+                    <ul class = "nav navbar-nav navbar-right" ng-controller="quitCtrl">
+                        <li id = "loginBtn"><a href="/register/lost/login"><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
+                        <li id = "registerBtn" ><a href="/register/lost/register"><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
+                        <li style = "display: none" id = "userBtn"><a><span id = "userName"><%= username%></span></a></li>
+                        <li style = "display: none" id = "quitBtn" ng-click="quit()"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
                     </ul>
                 </div>
             </nav>
@@ -286,9 +365,9 @@
         <div class="col-md-4 column">
         </div>
         <div class="col-md-4 column">
-            <ul class="pager">
-                <li class="previous"><a href="#">&larr; 上一页</a></li>
-                <li class="next"><a href="#">下一页 &rarr;</a></li>
+            <ul class="pager" ng-controller="turnPageCtrl">
+                <li class="previous"><a ng-click="upPage()">&larr; 上一页</a></li>
+                <li class="next"><a ng-click="downPage()">下一页 &rarr;</a></li>
             </ul>
         </div>
         <div class="col-md-4 column">

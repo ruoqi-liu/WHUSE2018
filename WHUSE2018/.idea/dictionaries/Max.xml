@@ -2,7 +2,9 @@
   <dictionary name="Max">
     <words>
       <w>clearfix</w>
+      <w>linkadd</w>
       <w>linkto</w>
+      <w>linkwithout</w>
       <w>turnpage</w>
     </words>
   </dictionary>

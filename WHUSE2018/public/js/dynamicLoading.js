@@ -47,8 +47,3 @@ function showLostContent(id, color, image, title, time, content){
     document.getElementById(id).innerHTML = html;
     document.getElementById(id).style.display = "block";
 }
-
-//根据传入的参数，显示用户名
-function showUserName(name) {
-    document.getElementById("userName").innerHTML = "&nbsp&nbsp" + name;
-}

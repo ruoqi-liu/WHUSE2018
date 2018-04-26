@@ -1,4 +1,3 @@
-<%- include register.ejs %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -13,11 +12,11 @@
     <link rel="stylesheet" href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <script type="text/javascript" src="/js/webLink.js"></script>
     <script type="text/javascript" src="/js/displayEffect.js"></script>
     <script type="text/javascript" src="/js/dynamicLoading.js"></script>
-    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
 
     <script>
         //页面打开时自动加载需要显示的内容
@@ -52,28 +51,32 @@
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。',
                 '/lost');
-            let curLink = window.location.href;
-            let urls = curLink.split("?");
-            if(urls[0] !== curLink){
-                let args = urls[1].split("&");
-                let arg = args[0].split("=");
-                if(arg[1] === "true"){
-                    arg = args[1].split("=");
-                    loginBtn("hidden");
-                    showUserName(arg[1]);
-                }
-                else{
-                    loginBtn("show");
-                }
-            }
-            else{
-                loginBtn("show");
+            if(document.getElementById("userName").innerText !== "用户"){
+                loginBtn("hidden");
             }
         })
+
+        let quit = angular.module('quit', []);
+        quit.controller('quitCtrl', ['$scope', '$http',
+            function ($scope, $http) {
+                $scope.quit = function () {
+                    $http({
+                        method:'post',
+                        url:'/user/logout'
+                    }).then(
+                        function success(res) {
+                            loginBtn("show");
+                        }
+                    )
+                }
+            }
+        ])
+
+        angular.module('index.app', ['quit']);
     </script>
 </head>
 
-<body>
+<body ng-app="index.app">
 
 <div class="container">
     <div class="row clearfix">
@@ -81,21 +84,21 @@
             <nav class="navbar navbar-default" role="navigation">
                 <!--Logo,跳转到首页-->
                 <div class="col-md-4 navbar-header">
-                    <a class = "navbar-brand fa fa-smile-o fa-lg" onclick="linkto('')">&nbsp iManager</a>
+                    <a class = "navbar-brand fa fa-smile-o fa-lg" href="">&nbsp iManager</a>
                     <!--页面导航，返回主页或者跳到失物招领页，首页即为当前页面-->
                     <ul class="nav navbar-nav">
-                        <li class="active"><a onclick="linkto('/')">返回主页</a></li>
-                        <li><a onclick="linkto('/lost')">失物招领</a></li>
+                        <li class="active"><a href="/index">返回主页</a></li>
+                        <li><a href="/lost/lost/1">失物招领</a></li>
                     </ul>
                 </div>
                 <!--页面功能导航-->
                 <div class="col-md-8">
                     <!--登录相关按钮-->
-                    <ul class = "nav navbar-nav navbar-right">
-                        <li id = "loginBtn" data-toggle="modal" data-target="#loginModal"><a><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
-                        <li id = "registerBtn" data-toggle="modal" data-target="#registerModal"><a><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
-                        <li style = "display: none" id = "userBtn"><a><span id = "userName" class = "fa fa-user"></span></a></li>
-                        <li style = "display: none" id = "quitBtn" ><a href = "/"><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
+                    <ul class = "nav navbar-nav navbar-right" ng-controller="quitCtrl">
+                        <li id = "loginBtn"><a href="/register/index/login"><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
+                        <li id = "registerBtn" ><a href="/register/index/register"><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
+                        <li style = "display: none" id = "userBtn"><a><span id = "userName"><%= username%></span></a></li>
+                        <li style = "display: none" id = "quitBtn" ng-click="quit()"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
                     </ul>
                 </div>
             </nav>
@@ -136,9 +139,5 @@
         </div>
     </div>
 </div>
-
-<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
 </body>
 </html>
