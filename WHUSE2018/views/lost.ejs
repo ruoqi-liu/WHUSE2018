@@ -49,14 +49,14 @@
                 $scope.publish = function () {
                     let s;
 
-                    s = document.getElementById("infoType");
+                    s = document.getElementById("type");
                     if (s.value === ""){
                         alert("请填写所有信息!");
                         s.focus();
                         return false;
                     }
 
-                    s = document.getElementById("lostType");
+                    s = document.getElementById("content");
                     if (s.value === ""){
                         alert("请填写所有信息!");
                         s.focus();
@@ -82,9 +82,9 @@
                         url:'/posts/add',
                         data: {
                             newpost: {
-                                title: document.getElementById("lostType").value,
+                                title: document.getElementById("title").value,
                                 content: document.getElementById("content").value,
-                                type: document.getElementById("infoType").value,
+                                type: document.getElementById("type").value,
                                 postinfo:
                                     {
                                         date: document.getElementById("time").value,
@@ -107,9 +107,7 @@
             }])
 
         $(document).ready(function () {
-            showLostContent("lost-content-1", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
-            showLostContent("lost-content-2", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
-            showLostContent("lost-content-3", "card-label-color-blue", "/images/0001.jpg", "校园卡", "18:42 03/01/2018", "学号为2015302580173，在信息学部二食堂南门处捡到，失主请联系我，联系方式为：18727490925");
+            document.getElementById("searchBtn").click();
             if(document.getElementById("userName").innerText !== "用户"){
                 loginBtn("hidden");
             }
@@ -121,7 +119,7 @@
                 $scope.search = function () {
                     $http({
                         method: 'post',
-                        url: '/posts/search/' + document.getElementById("losttype").innerText + '/' + document.getElementById("lostpage").innerText,
+                        url: '/posts/search/' + document.getElementById("titleSearch").value + '/' + document.getElementById("pageNum").innerText,
                         data: {
                             text: document.getElementById("search").value
                         }
@@ -182,28 +180,84 @@
         turn.controller('turnPageCtrl', ['$scope', '$http',
             function ($scope, $http) {
             $scope.upPage = function () {
-                var curPage = document.getElementById("lostpage").innerText;
-                curPage++;
+                var curPage = document.getElementById("pageNum").innerText;
+                curPage--;
+                if(curPage === 0){
+                    alert("已经是第一页！");
+                    return;
+                }
                 $http({
                     method:'get',
-                    url:'/posts/' + document.getElementById("losttype").innerText + '/' + curPage,
+                    url:'/posts/' + document.getElementById("typeSearch").value + '/' + curPage,
                 }).then(
                     function success(res) {
-                        alert(JSON.stringify(res));
-                        document.getElementById("lostpage").innerText = curPage;
+                        let resultArray = res.data.result;
+                        let length = resultArray.length;
+                        document.getElementById("lost-content-1").style.visibility = "hidden";
+                        document.getElementById("lost-content-2").style.visibility = "hidden";
+                        document.getElementById("lost-content-3").style.visibility = "hidden";
+                        let curResult;
+                        if(length !== 0) {
+                            curResult = resultArray[0];
+                            showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                            document.getElementById("lost-content-1").style.visibility = "visible";
+                            length--;
+                        }
+
+                        if(length !== 0) {
+                            curResult = resultArray[1];
+                            showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                            document.getElementById("lost-content-2").style.visibility = "visible";
+                            length--;
+                        }
+
+                        if(length !== 0) {
+                            curResult = resultArray[2];
+                            showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                            document.getElementById("lost-content-3").style.visibility = "visible";
+                        }
+                        document.getElementById("pageNum").innerText = curPage;
                     }
                 )
             }
             $scope.downPage = function () {
-                var curPage = document.getElementById("lostpage").innerText;
-                curPage--;
+                var curPage = document.getElementById("pageNum").innerText;
+                curPage++;
                 $http({
                     method:'get',
-                    url:'/posts/' + document.getElementById("losttype").innerText + '/' + curPage,
+                    url:'/posts/' + document.getElementById("typeSearch").value + '/' + curPage,
                 }).then(
                     function success(res) {
-                        alert(JSON.stringify(res));
-                        document.getElementById("lostpage").innerText = curPage;
+                        let resultArray = res.data.result;
+                        let length = resultArray.length;
+                        if(length === 0){
+                            alert("已经到最后一页！");
+                            return;
+                        }
+                        document.getElementById("lost-content-1").style.visibility = "hidden";
+                        document.getElementById("lost-content-2").style.visibility = "hidden";
+                        document.getElementById("lost-content-3").style.visibility = "hidden";
+                        let curResult;
+                        if(length !== 0) {
+                            curResult = resultArray[0];
+                            showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                            document.getElementById("lost-content-1").style.visibility = "visible";
+                            length--;
+                        }
+
+                        if(length !== 0) {
+                            curResult = resultArray[1];
+                            showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                            document.getElementById("lost-content-2").style.visibility = "visible";
+                            length--;
+                        }
+
+                        if(length !== 0) {
+                            curResult = resultArray[2];
+                            showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                            document.getElementById("lost-content-3").style.visibility = "visible";
+                        }
+                        document.getElementById("pageNum").innerText = curPage;
                     }
                 )
             }
@@ -215,19 +269,17 @@
 </head>
 
 <body ng-app ="lostApp">
-<p id = "losttype" style="display: none"><%= type %></p>
-<p id = "lostpage" style="display: none"><%= page %></p>
 <div class="container">
     <div class="row clearfix">
         <div class="col-md-12 column">
-            <nav class="navbar navbar-default" role="navigation">
+            <nav class="navbar navbar-default navbar-inverse" role="navigation">
                 <!--Logo,跳转到首页-->
                 <div class="col-md-4 navbar-header">
-                    <a class = "navbar-brand fa fa-smile-o fa-lg" href="">&nbsp iManager</a>
                     <!--页面导航，返回主页或者跳到失物招领页，首页即为当前页面-->
                     <ul class="nav navbar-nav">
+                        <li><a href = "/"><img src = "/images/logo.png"></a></li>
                         <li><a href="/index">返回主页</a></li>
-                        <li class="active"><a href="/lost/lost/page1">失物招领</a></li>
+                        <li class="active"><a href="/lost">失物招领</a></li>
                     </ul>
                 </div>
                 <!--页面功能导航-->
@@ -258,53 +310,45 @@
                                 <!--模态框内容,为一个表单-->
                                 <div class = "modal-body">
                                     <form id = "inputList" class="form-horizontal" role = "form">
-
                                         <!--信息类别-->
                                         <div class = "form-group">
-                                            <label for = "infoType" class = "col-md-4 control-label fa fa-sort-amount-asc">&nbsp&nbsp信息类别</label>
+                                            <label for = "type" class = "col-md-3 control-label fa fa-sort-amount-asc">&nbsp&nbsp信息类别</label>
                                             <div class = "col-md-8">
-                                                <select id = infoType class = "form-control">
+                                                <select id = type class = "form-control">
                                                     <option value = "">请选择</option>
+                                                    <option value = "lost">寻找失物</option>
                                                     <option value = "found">寻找失主</option>
-                                                    <option value = "lost">失物招领</option>
                                                 </select>
                                             </div>
                                         </div>
 
                                         <!--物品类别-->
                                         <div class = "form-group">
-                                            <label for = "lostType" class = "col-md-4 control-label fa fa-navicon">&nbsp&nbsp物品类别</label>
+                                            <label for = "title" class = "col-md-3 control-label fa fa-navicon">&nbsp&nbsp信息标题</label>
                                             <div class = "col-md-8">
-                                                <select id = lostType class = "form-control">
-                                                    <option value = "">请选择</option>
-                                                    <option value = "校园卡">校园卡</option>
-                                                    <option value = "现金">现金</option>
-                                                    <option value = "生活物品">生活物品</option>
-                                                    <option value = "学习资料">学习资料</option>
-                                                    <option value = "电子产品">电子产品</option>
-                                                </select>
+                                                <input id = "title" type = "text" class = "form-control" placeholder="请输入信息标题">
                                             </div>
                                         </div>
 
                                         <!--丢失时间-->
                                         <div class = "form-group">
-                                            <label for = "time" class = "col-md-4 control-label fa fa-at">&nbsp&nbsp丢失时间</label>
+                                            <label for = "time" class = "col-md-3 control-label fa fa-at">&nbsp&nbsp丢失时间</label>
                                             <div class = "col-md-8">
-                                                <input id = "time" type = "text" class = "form-control" placeholder = "请输入时间">
+                                                <input id = "time" type = "datetime-local" class = "form-control" placeholder = "请输入时间">
                                             </div>
                                         </div>
 
                                         <!--具体内容-->
                                         <div class = "form-group">
-                                            <label for = "content" class = "col-md-4 control-label fa fa-expand">&nbsp&nbsp详细信息</label>
+                                            <label for = "content" class = "col-md-3 control-label fa fa-expand">&nbsp&nbsp详细信息</label>
                                             <div class = "col-md-8">
-                                                <input id = "content" type = "text" class = "form-control" placeholder = "请输入物品简介">
+                                                <textarea id = "content" class = "form-control" row = "3" placeholder = "请输入物品简介"></textarea>
                                             </div>
                                         </div>
 
                                         <!--上传图片-->
                                         <div class = "form-group">
-                                            <lable for = "image" class = "col-md-4 control-label fa fa-image">&nbsp&nbsp上传图片</lable>
+                                            <lable for = "image" class = "col-md-3 control-label fa fa-image">&nbsp&nbsp上传图片</lable>
                                             <div class = "col-md-8 input-icon-group">
                                                 <a href="javascript:" class="a-upload">
                                                     <input type="file" name="" id="image">
@@ -323,14 +367,6 @@
                         </div>
                     </div>
 
-                    <!--搜索栏，点击搜索，显示匹配的信息-->
-                    <div class = "col-md-4">
-                        <div class = "input-group input-group-lg" ng-controller="searchCtrl">
-                            <input id = "search" type = "text" class = "form-control" title="搜索">
-                            <span class = "input-group-btn"><button class = "btn btn-default" type = "button" ng-click="search()">搜索</button></span>
-                        </div>
-                    </div>
-
                     <!--登录相关按钮-->
                     <ul class = "nav navbar-nav navbar-right" ng-controller="quitCtrl">
                         <li id = "loginBtn"><a href="/register/lost/login"><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
@@ -343,34 +379,56 @@
         </div>
     </div>
     <div class="row clearfix">
-        <div class="col-md-offset-2 col-md-8">
-            <!--日期、天气信息,给用户打个招呼-->
+        <div class="col-md-offset-2 col-md-8" ng-controller="searchCtrl">
             <div class="row clearfix" style="margin-bottom: 15px;">
-                <div class="col-md-7 column">
+                <!--日期、天气信息,给用户打个招呼-->
+                <div class="col-md-4 column">
                     <h4>18:42 星期五 3月23日 &nbsp;</h4>
+                </div>
+
+                <div class = "col-md-4 column">
+                    <select id = titleSearch class = "form-control">
+                        <option value = "lost">寻找失物</option>
+                        <option value = "found">寻找失主</option>
+                    </select>
+                </div>
+
+                <!--搜索栏，点击搜索，显示匹配的信息-->
+                <div class = "col-md-4 column">
+                    <div class = "input-group">
+                        <input id = "search" type = "text" class = "form-control" title="搜索" value="校园卡">
+                        <span class = "input-group-btn"><button id = "searchBtn" class = "btn btn-default" type = "button" ng-click="search()">搜索</button></span>
+                    </div>
                 </div>
             </div>
 
-            <div class="content card-frame" id="lost-content-1" style="display: none">
+            <div class="content card-frame" id="lost-content-1">
             </div>
             &nbsp;
-            <div class="content card-frame" id="lost-content-2" style="display: none">
+            <div class="content card-frame" id="lost-content-2">
             </div>
             &nbsp;
-            <div class="content card-frame" id="lost-content-3" style="display: none">
+            <div class="content card-frame" id="lost-content-3">
             </div>
         </div>
     </div>
     <div class="row clearfix">
-        <div class="col-md-4 column">
+        <div class="col-md-3 column">
         </div>
-        <div class="col-md-4 column">
+        <div class="col-md-8 column">
             <ul class="pager" ng-controller="turnPageCtrl">
-                <li class="previous"><a ng-click="upPage()">&larr; 上一页</a></li>
-                <li class="next"><a ng-click="downPage()">下一页 &rarr;</a></li>
+                <div class = "col-md-3">
+                <li class="previous"><a id = "upPage" ng-click="upPage()">&larr; 上一页</a></li>
+                </div>
+                <div class = "col-md-3">
+                    <li class = "pagination"><a id = "pageNum">1</a></li>
+                </div>
+                <div class = "col-md-3">
+                <li class="next"><a id = "downPage" ng-click="downPage()">下一页 &rarr;</a></li>
+                </div>
             </ul>
         </div>
-        <div class="col-md-4 column">
+        <div class="col-md-2 column">
         </div>
     </div>
 </div>

@@ -30,7 +30,7 @@
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。',
-                '/lost');
+                '/lost/lost/1');
             showNewsContent('news-content-2',
                 'card-label-color-blue',
                 '/images/0001.jpg',
@@ -40,7 +40,7 @@
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。',
-                '/lost');
+                '/index');
             showNewsContent('news-content-3',
                 'card-label-color-blue',
                 '/images/0001.jpg',
@@ -50,7 +50,7 @@
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。',
-                '/lost');
+                '/');
             if(document.getElementById("userName").innerText !== "用户"){
                 loginBtn("hidden");
             }
@@ -81,14 +81,14 @@
 <div class="container">
     <div class="row clearfix">
         <div class="col-md-12 column">
-            <nav class="navbar navbar-default" role="navigation">
+            <nav class="navbar navbar-default navbar-inverse" role="navigation">
                 <!--Logo,跳转到首页-->
                 <div class="col-md-4 navbar-header">
-                    <a class = "navbar-brand fa fa-smile-o fa-lg" href="">&nbsp iManager</a>
                     <!--页面导航，返回主页或者跳到失物招领页，首页即为当前页面-->
                     <ul class="nav navbar-nav">
+                        <li><a href = "/"><img src = "/images/logo.png"></a></li>
                         <li class="active"><a href="/index">返回主页</a></li>
-                        <li><a href="/lost/lost/1">失物招领</a></li>
+                        <li><a href="/lost">失物招领</a></li>
                     </ul>
                 </div>
                 <!--页面功能导航-->
@@ -132,6 +132,7 @@
         <div class="col-md-4 column">
             <ul class="pager">
                 <li class="previous"><a href="">&larr; 上一页</a></li>
+                <p id = "pageNum">1</p>
                 <li class="next"><a href="">下一页 &rarr;</a></li>
             </ul>
         </div>

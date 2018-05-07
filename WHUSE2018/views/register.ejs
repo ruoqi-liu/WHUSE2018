@@ -20,9 +20,6 @@
             else if(type === "register"){
                 $("#registerModal").modal("show");
             }
-            else{
-                console.log("你怎么进来的？");
-            }
         })
 
         var register = angular.module("register", []);
@@ -39,7 +36,7 @@
                         isError = true;
                         return;
                     }
-                    else if ($("#registeruser").val().length == 0) {
+                    else if ($("#registeruser").val().length === 0) {
                         oError.innerHTML = "用户名不能为空！";
                         isError = true;
                         return;
@@ -54,7 +51,7 @@
                         isError = true;
                         return;
                     }
-                    else if (inputPass != repeatPass) {
+                    else if (inputPass !== repeatPass) {
                         oError.innerHTML = "两次密码输入不一致！";
                         isError = true;
                         return;
@@ -76,7 +73,7 @@
                                     window.location.href = "/index";
                                 }
                                 else{
-                                    window.location.href = "/lost/lost/1";
+                                    window.location.href = "/lost";
                                 }
                             }
                             else {
@@ -118,7 +115,7 @@
                                     window.location.href = "/index";
                                 }
                                 else{
-                                    window.location.href = "/lost/lost/1";
+                                    window.location.href = "/lost";
                                 }
                             }
                             else {

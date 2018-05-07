@@ -129,6 +129,8 @@ router.post('/search/:type/:page', function (req, res, next) {
 
     var textParts = defaultSegment(text);
 
+
+
     postCollection.find({
         'type': type, $or: [
             { titleIndex: { $in: textParts } },

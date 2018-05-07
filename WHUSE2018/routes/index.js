@@ -14,12 +14,12 @@ router.get('/index', function (req, res, next) {
   res.render('index', { title: 'Express','username':user.username });
 });
 
-router.get('/lost/:type/:page', function (req, res, next) {
-    var type = req.params.type;
-    var page = req.params.page;
+router.get('/lost', function (req, res, next) {
+    /*var type = req.params.type;
+    var page = req.params.page;*/
     var user = req.user;
     if(!user) user={username:'用户'};
-    res.render('lost', { title: 'Lost and Found' ,type:type, page:page, 'username':user.username});
+    res.render('lost', { title: 'Lost and Found' ,/*type:type, page:page,*/ 'username':user.username});
 });
 
 router.get('/register/:source/:type', function (req, res, next) {
