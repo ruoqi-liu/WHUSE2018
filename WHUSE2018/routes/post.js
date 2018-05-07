@@ -1,3 +1,4 @@
+
 var defaultSegment = require('../Segment/mySegment').defaultSegment;
 var express = require('express');
 var session = require('express-session');
@@ -42,7 +43,8 @@ router.post('/add', isAuthentic, function (req, res, next) {//newpost: title,con
         else {
             res.send({ 'addpost': '1' });
             postCollection.createIndex({titleIndex:1});
-            postCollection.createIndex({contentIndex:1});
+            postCollection.createIndex({ contentIndex: 1 });
+            postCollection.createIndex({ 'postinfo.geoJson': '2dsphere' });
         }
         return;
     }).catch((err) => {
@@ -124,19 +126,29 @@ router.post('/search/:type/:page', function (req, res, next) {
     if(!page) page =1;
     var skipNum = (page - 1) * pageLimit;
     if (skipNum < 0) skipNum = 0;
+
+    var geoJson = req.body.geoJson;
     var text = req.body.text;
     if (!text) return res.send({ 'searchpost': '0', message: 'search text cannnot be null' });
 
     var textParts = defaultSegment(text);
-
-
-
-    postCollection.find({
+    var query = {
         'type': type, $or: [
             { titleIndex: { $in: textParts } },
-            { contentIndex: { $in: textParts }}
+            { contentIndex: { $in: textParts } }
         ]
-    }, { limit: pageLimit, skip: skipNum }).
+    };
+
+    if (geoJson)
+        query['postinfo.geoJson'] = {
+                $near: {
+                    $geometry: geoJson,
+                    $minDistance: 0,
+                    $maxDistance: 100
+                }
+        };
+
+    postCollection.find(query, { limit: pageLimit, skip: skipNum }).
         then((result) => {
             res.send({ 'searchpost': '1', 'result': result });
             return;
