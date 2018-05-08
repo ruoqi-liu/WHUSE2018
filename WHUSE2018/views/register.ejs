@@ -12,8 +12,12 @@
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
+        let type;
+        let source;
+
         $(document).ready(function () {
-            let type = document.getElementById("checkType").innerText;
+            type = document.getElementById("checkType").innerText;
+            source = document.getElementById("checkSource").innerText;
             if(type === "login"){
                 var login = document.getElementById("loginModal");
                 $(login).modal("show");
@@ -29,10 +33,10 @@
             function($scope, $http) {
                 $scope.register = function(){
                     var oError = document.getElementById("error_box2");
-                    var reg = new RegExp(/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/);  //正则表达式判断字符串是否由数字和字母组成
-                    var registerUser = document.getElementById("registerUser").value;
+                    var reg = new RegExp(/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/);
                     var inputPass = document.getElementById("inputPassword").value;
                     var repeatPass = document.getElementById("repeatPassword").value;
+                    var registerUser = document.getElementById("registerUser").value;
                     if (registerUser.length > 7) {
                         oError.innerHTML = "用户名长度过长！";
                         return;
@@ -65,7 +69,6 @@
                             console.log("请求成功", res);
                             if(res.data.isregister === "1"){
                                 alert("注册成功");
-                                let source = document.getElementById("checkSource").innerText;
                                 if(source === "index"){
                                     window.location.href = "/index";
                                 }
@@ -108,7 +111,6 @@
                             console.log("请求成功", res);
                             if(res.data.islogin === "1"){
                                 alert("登录成功");
-                                let source = document.getElementById("checkSource").innerText;
                                 if(source === "index"){
                                     window.location.href = "/index";
                                 }
