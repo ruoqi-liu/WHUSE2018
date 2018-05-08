@@ -84,7 +84,7 @@ router.post('/register', function (req, res, next) {//add
 //});
 //return;
 
-//required body.password,content:{name:[,password(optional)]}
+//required body.password,content:{name:,password:(both optional)}
 router.put('/:name', isAuthentic, function (req, res, next) {//update username or password
     if (!req.body.content) return res.send({ 'isupdate': '0', 'message': 'content null' });
     var content = req.body.content;

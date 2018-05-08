@@ -54,7 +54,7 @@ passport.use('signUp', new LocalStrategy(
             done(null, false, { 'valid': '0', message: 'username or password cannot be null.' });
         collection.createIndex({name:1},{unique:true});
         collection.insert({
-            name: username, password: password, userinfo: { photo:'/images/0001.jpg'}}, function (err, result) {
+            name: username, password: password, userinfo: { photo:'/images/0001.jpg'},tags:[[]]}, function (err, result) {
             if (err)
                 if (err.code == 11000)
                     return done(null, false, { message: 'duplicated username', 'valid': '0' });

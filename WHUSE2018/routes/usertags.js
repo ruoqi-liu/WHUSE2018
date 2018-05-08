@@ -50,4 +50,28 @@ router.delete('/:name', isAuthentic, userNameVerify, function (req, res, next) {
         });
 });
 
+//add faculty require req.body.newfaculty array of string
+router.post('/faculty/add/:name',isAuthentic,userNameVerify,function (req,res,next) {
+    collection.update({ 'name': req.params.name }, { $push: { 'tags.0': { $each: req.body.newtags } } }).
+    then((result) => {
+        if (result.n == 1) return res.send({ 'addusertags': '1' });
+    res.send({ 'addusertags': '0', message: 'add faculty failed' });
+}).catch((err) => {
+        res.send({ 'addusertags': '0', message: 'db error' });
+    console.log(err);
+});
+});
+
+//delete faculty require req.body.deletefaculty array of string
+router.delete('/faculty/:name',isAuthentic,userNameVerify,function (req,res,next) {
+    collection.update({ 'name': req.params.name }, { $pullAll: { 'tags.0': req.body.deletetags } }).
+    then((result) => {
+        if (result.n == 1) return res.send({ 'deleteuserfaculty': '1' });
+    res.send({ 'deleteuserfaculty': '0', message: 'delete faculty failed' });
+}).catch((err) => {
+        res.send({ 'deleteuserfaculty': '0', message: 'db error' });
+    console.log(err);
+});
+});
+
 module.exports = router;

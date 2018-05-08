@@ -196,7 +196,7 @@
                     <ul class = "nav navbar-nav navbar-right" ng-controller="quitCtrl">
                         <li id = "loginBtn"><a onclick="window.location.href='/register/index/login'"><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
                         <li id = "registerBtn"><a onclick="window.location.href='/register/index/register'"><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
-                        <li id = "userBtn" style = "display: none"><a><span id = "userName"><%= username%></span></a></li>
+                        <li id = "userBtn" style = "display: none"><a onclick="window.location.href='/user'"><span id = "userName"><%= username%></span></a></li>
                         <li id = "quitBtn" style = "display: none" ng-click="quit()"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
                     </ul>
                 </div>
