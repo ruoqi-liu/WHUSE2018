@@ -92,21 +92,21 @@ router.put('/:name', isAuthentic, function (req, res, next) {//update username o
     if (content.password)
         updateQuery['password'] = content.password;
     collection.update({ name: req.params.name, password: req.body.password }, {
-        $set:  updateQuery 
+        $set: updateQuery
     }
         , function (err, result) {
             console.log(result);
-        if (err)
-            if (err.code == 11000)
-                res.send({ 'isupdate': '0', 'message': 'duplicated name' });
+            if (err)
+                if (err.code == 11000)
+                    res.send({ 'isupdate': '0', 'message': 'duplicated name' });
+                else
+                    res.send({ 'isupdate': '0', 'message': 'unkonwn' });
+            else if (result.ok == 1)
+                res.send({ 'isupdate': '1' });
             else
-                res.send({ 'isupdate': '0', 'message': 'unkonwn' });
-        else if (result.ok==1)
-            res.send({ 'isupdate': '1' });
-        else
-            res.send({ 'isupdate': '0', 'message': 'password no change' });
-        return;
-    }
+                res.send({ 'isupdate': '0', 'message': 'password no change' });
+            return;
+        }
     );
     return;
 });
@@ -129,21 +129,22 @@ router.delete('/:name', isAuthentic, function (req, res, next) {//delete
 //required 
 router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {//user name,userinfo,tags,posts[postid,title]
     var limitNum = 3;
-    collection.find({ name: req.params.name}, { fields: { password: 0 } }).then((doc) => {
+    collection.find({ name: req.params.name }, { fields: { password: 0 } }).then((doc) => {
         if (doc.length != 1)
             return res.send({ 'getuser': '0', message: 'db.find result incorrect' });
         doc = doc[0];
         req.flash('userdoc', doc);
         var postids = doc.postid;
-        postCollection.find({ '_id': { $in: postids } }, { /*fields: { title: 1 }*/limit:limitNum }).then((posts) => {
+        postCollection.find({ '_id': { $in: postids } }, { /*fields: { title: 1 }*/limit: limitNum }).then((posts) => {
             delete doc['postid'];
             doc['posts'] = posts;//posts: array of post
-            return res.send({ 'getuser': '1', user: doc }).catch(err => { console.log(err); });
-        });
-    }).catch(err => {
-        console.log(err);
-    });
-});
+            return res.send({ 'getuser': '1', user: doc });
+        } );
+    }
+    ).catch(err => { console.log(err);});
+
+}
+);
 
 
 router.use('/logout', logout);

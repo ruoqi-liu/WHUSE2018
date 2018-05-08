@@ -46,7 +46,7 @@ app.use('/users', usersRouter);
 app.use('/user', userRouter);
 app.use('/userinfo',userInfoRouter);
 app.use('/posts', postRouter);
-app.use('/userpost', userPostRouter);
+app.use('/userposts', userPostRouter);
 app.use('/usertags',userTagsRouter);
 app.use('/news',newsRouter);
 app.use('/tags',tagsRouter);
