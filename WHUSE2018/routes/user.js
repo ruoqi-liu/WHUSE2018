@@ -128,15 +128,16 @@ router.delete('/:name', isAuthentic, function (req, res, next) {//delete
 
 //required 
 router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {//user name,userinfo,tags,posts[postid,title]
+    var limitNum = 3;
     collection.find({ name: req.params.name}, { fields: { password: 0 } }).then((doc) => {
         if (doc.length != 1)
             return res.send({ 'getuser': '0', message: 'db.find result incorrect' });
         doc = doc[0];
         req.flash('userdoc', doc);
         var postids = doc.postid;
-        postCollection.find({ '_id': { $in: postids } }, { fields: { title: 1 } }).then((posts) => {
+        postCollection.find({ '_id': { $in: postids } }, { /*fields: { title: 1 }*/limit:limitNum }).then((posts) => {
             delete doc['postid'];
-            doc['posts'] = posts;//posts: array of {_id,title}
+            doc['posts'] = posts;//posts: array of post
             return res.send({ 'getuser': '1', user: doc }).catch(err => { console.log(err); });
         });
     }).catch(err => {

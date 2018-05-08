@@ -11,7 +11,13 @@ var db = monk('localhost:27017/WHUSE');
 var collection = db.get('user');
 var postCollection = db.get('post');
 
-router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {//get all posts
+router.get('/:name/:page', isAuthentic, userNameVerify, function (req, res, next) {//get all posts
+    var page = req.params.page;
+    var pageLimit = 3;
+    if (!page) page = 1;
+    var skipNum = (page - 1) * pageLimit;
+    if (skipNum < 0) skipNum = 0;
+
     collection.find({ name: req.params.name }, { fields: { postid: 1 } }).then((doc) => {
         if (doc.length != 1)
             res.send({ 'getuserpost': '0', message: 'db.find result incorrect' });
@@ -20,7 +26,7 @@ router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {//g
         if (!postids)
             return [];
         else
-            return postCollection.find({ '_id': { $in: postids } }, { fields: { title: 1 } });
+            return postCollection.find({ '_id': { $in: postids } }, {limit:pageLimit,skip:skipNum /*fields: { title: 1 }*/ });
     }).then((posts) => {
         res.send({ 'getuserpost': '1', 'posts': posts });
     }
