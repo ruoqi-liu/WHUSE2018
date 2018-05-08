@@ -27,7 +27,7 @@ router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {
 
 //required req.body.newtags , array of string
 router.post('/:name', isAuthentic, userNameVerify, function (req, res, next) {
-    collection.update({ 'name': req.params.name }, { $push: { tags: { $each: req.body.newtags } } }).
+    collection.update({ 'name': req.params.name }, { $addToSet: { tags: { $each: req.body.newtags } } }).
         then((result) => {
             if (result.n == 1) return res.send({ 'addusertags': '1' });
              res.send({ 'addusertags': '0', message: 'add tags failed' });
@@ -40,7 +40,7 @@ router.post('/:name', isAuthentic, userNameVerify, function (req, res, next) {
 
 //required req.body.deletetags , array of string
 router.delete('/:name', isAuthentic, userNameVerify, function (req, res, next) {
-    collection.update({ 'name': req.params.name }, { $pullAll: { tags: req.body.deletetags } }).
+    collection.update({ 'name': req.params.name }, { $pullAll: { tags: req.body.deletefaculty } }).
         then((result) => {
             if (result.n == 1) return res.send({ 'deleteusertags': '1' });
             res.send({ 'deleteusertags': '0', message: 'delete tags failed' });
@@ -52,19 +52,19 @@ router.delete('/:name', isAuthentic, userNameVerify, function (req, res, next) {
 
 //add faculty require req.body.newfaculty array of string
 router.post('/faculty/add/:name',isAuthentic,userNameVerify,function (req,res,next) {
-    collection.update({ 'name': req.params.name }, { $push: { 'tags.0': { $each: req.body.newtags } } }).
+    collection.update({ 'name': req.params.name }, { $addToSet: { 'tags.0': { $each: req.body.newfaculty } } }).
     then((result) => {
-        if (result.n == 1) return res.send({ 'addusertags': '1' });
-    res.send({ 'addusertags': '0', message: 'add faculty failed' });
+        if (result.n == 1) return res.send({ 'adduserfaculty': '1' });
+    res.send({ 'adduserfaculty': '0', message: 'add faculty failed' });
 }).catch((err) => {
-        res.send({ 'addusertags': '0', message: 'db error' });
+    res.send({ 'adduserfaculty': '0', message: 'db error' });
     console.log(err);
 });
 });
 
 //delete faculty require req.body.deletefaculty array of string
 router.delete('/faculty/:name',isAuthentic,userNameVerify,function (req,res,next) {
-    collection.update({ 'name': req.params.name }, { $pullAll: { 'tags.0': req.body.deletetags } }).
+    collection.update({ 'name': req.params.name }, { $pullAll: { 'tags.0': req.body.deletefaculty } }).
     then((result) => {
         if (result.n == 1) return res.send({ 'deleteuserfaculty': '1' });
     res.send({ 'deleteuserfaculty': '0', message: 'delete faculty failed' });

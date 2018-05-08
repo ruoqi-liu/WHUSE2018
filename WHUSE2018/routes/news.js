@@ -42,7 +42,7 @@ router.post('/:name/:page', isAuthentic, userNameVerify, function (req, res, nex
         var faculty = tags[0];
         var query = {'tags': { '$in': tags },'faculty':{ '$in': faculty } };
         if(!faculty||faculty.length==0) delete query['faculty'];
-        if (!tags || tags.length == 0) delete query['tags'];
+        if (!tags || tags.length == 1) delete query['tags'];
         return newsCollection.find(query, { fields: { tags: 0 }, sort: { date: -1 }, limit: limitNum ,skip:skipNum});
     }).then(results => {
         res.send({ 'getNews': '1', 'news': results });
