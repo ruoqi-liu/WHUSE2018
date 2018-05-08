@@ -15,10 +15,12 @@
         $(document).ready(function () {
             let type = document.getElementById("checkType").innerText;
             if(type === "login"){
-                $("#loginModal").modal("show");
+                var login = document.getElementById("loginModal");
+                $(login).modal("show");
             }
             else if(type === "register"){
-                $("#registerModal").modal("show");
+                var register = document.getElementById("registerModal");
+                $(register).modal("show");
             }
         })
 
@@ -27,41 +29,36 @@
             function($scope, $http) {
                 $scope.register = function(){
                     var oError = document.getElementById("error_box2");
-                    var isError = false;
                     var reg = new RegExp(/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/);  //正则表达式判断字符串是否由数字和字母组成
+                    var registerUser = document.getElementById("registerUser").value;
                     var inputPass = document.getElementById("inputPassword").value;
                     var repeatPass = document.getElementById("repeatPassword").value;
-                    if ($("#registeruser").val().length > 14) {
+                    if (registerUser.length > 7) {
                         oError.innerHTML = "用户名长度过长！";
-                        isError = true;
                         return;
                     }
-                    else if ($("#registeruser").val().length === 0) {
+                    else if (registerUser.length === 0) {
                         oError.innerHTML = "用户名不能为空！";
-                        isError = true;
                         return;
                     }
-                    else if ($("#inputPassword").val().length < 6) {
-                        oError.innerHTML = "密码长度必须大于6位！";
-                        isError = true;
+                    else if (inputPass.length < 6) {
+                        oError.innerHTML = "密码长度必须不小于6位！";
                         return;
                     }
                     else if (!reg.test(inputPass)) {
                         oError.innerHTML = "密码需由字母和数字组成！";
-                        isError = true;
                         return;
                     }
                     else if (inputPass !== repeatPass) {
                         oError.innerHTML = "两次密码输入不一致！";
-                        isError = true;
                         return;
                     }
                     $http({
                         method: 'post',
                         url: '/user/register',
                         data: {
-                            name: document.getElementById("registeruser").value,
-                            password: document.getElementById("inputPassword").value
+                            name: registerUser,
+                            password: inputPass
                         }
                     }).then(
                         function success(res) {
@@ -89,12 +86,13 @@
             function($scope, $http) {
                 $scope.login = function(){
                     var oError = document.getElementById("error_box1");
-                    var isError = false;
-                    if ($("#loginuser").val().length === 0) {
+                    var loginUser = document.getElementById("loginUser").value;
+                    var loginPassword = document.getElementById("loginPassword").value;
+                    if (loginUser.length === 0) {
                         oError.innerHTML = "用户名不能为空！";
                         return;
                     }
-                    else if($("#loginpassword").val().length === 0){
+                    else if(loginPassword.length === 0){
                         oError.innerHTML = "密码不能为空！";
                         return;
                     }
@@ -102,8 +100,8 @@
                         method: 'post',
                         url: '/user/login',
                         data: {
-                            name: document.getElementById("loginuser").value,
-                            password: document.getElementById("loginpassword").value
+                            name: loginUser,
+                            password: loginPassword
                         }
                     }).then(
                         function success(res) {
@@ -132,7 +130,6 @@
 <body ng-app="registerApp">
 <p id = "checkSource" style="display: none"><%= source %></p>
 <p id = "checkType" style="display: none"><%= type %></p>
-<!-- 登录模态框 -->
 <div id="loginModal" class="modal fade">
     <div class="modal-dialog" style="width: 400px;">
         <div class="modal-content" ng-controller="loginCtrl">
@@ -142,24 +139,22 @@
                 </button>
             </div>
             <div class="modal-header">
-                <h3 class="modal-title" id="loginTitle">登录</h3>
+                <h3 class="modal-title">登录</h3>
             </div>
             <div class="modal-body">
                 <form class="form-group" action="">
                     <div class="form-group has-feedback">
                         <span class="glyphicon glyphicon-user form-control-feedback"></span>
-                        <input type="text" class="form-control" id="loginuser" name="username" placeholder="请输入用户名" autofocus>
+                        <input id="loginUser" type="text" class="form-control" name="username" placeholder="请输入用户名" autofocus>
                     </div>
-                    <!-- 密码框 -->
                     <div class="form-group has-feedback">
                         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-                        <input type="password" class="form-control" id="loginpassword" name="password" placeholder="请输入密码">
+                        <input id="loginPassword" type="password" class="form-control" name="password" placeholder="请输入密码">
                     </div>
                     <p id="error_box1"><br></p>
-                    <a href="" data-toggle="modal" data-dismiss="modal" data-target="#registerModal">忘记密码</a>
                     <div class="text-right">
-                        <button class="btn btn-default" data-toggle="modal" data-dismiss="modal" data-target="#registerModal">注册</button>
-                        <button class="btn btn-primary" type="button" id="login" ng-click="login()">登录</button>
+                        <button class="btn btn-default" type="button" data-toggle="modal" data-dismiss="modal" data-target="#registerModal">注册</button>
+                        <button class="btn btn-primary" type="button" ng-click="login()">登录</button>
                     </div>
                 </form>
             </div>
@@ -167,7 +162,6 @@
     </div>
 </div>
 
-<!-- 注册模态框 -->
 <div id="registerModal" class="modal fade">
     <div class="modal-dialog" style="width: 400px;">
         <div class="modal-content" ng-controller = "registerCtrl">
@@ -177,30 +171,28 @@
                 </button>
             </div>
             <div class="modal-header">
-                <h3 class="modal-title" id="loginTitle">注册</h3>
+                <h3 class="modal-title">注册</h3>
             </div>
             <div class="modal-body">
                 <form class="form-group" action="">
                     <div class="form-group has-feedback">
                         <span class="glyphicon glyphicon-user form-control-feedback"></span>
-                        <input type="text" class="form-control" id="registeruser" name="username" placeholder="请输入用户名" autofocus ng-model="name">
-                        <p class="text-muted">不超过7位汉字或14位字母</p>
+                        <input id="registerUser" type="text" class="form-control" name="username" placeholder="请输入用户名" autofocus ng-model="name">
+                        <p class="text-muted">用户名不超过7位字符</p>
                     </div>
-                    <!-- 密码框 -->
                     <div class="form-group has-feedback">
                         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-                        <input type="password" class="form-control" id="inputPassword" name="password" placeholder="请输入密码" ng-model="password">
+                        <input id="inputPassword" type="password" class="form-control" name="password" placeholder="请输入密码" ng-model="password">
                         <p class="text-muted">至少6位字母和数字</p>
                     </div>
-                    <!-- 确认密码框 -->
                     <div class="form-group has-feedback">
                         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-                        <input type="password" class="form-control" id="repeatPassword" name="password" placeholder="请再次输入密码">
+                        <input id="repeatPassword" type="password" class="form-control" name="password" placeholder="请再次输入密码">
                     </div>
                     <p id="error_box2"><br></p>
                     <div class="text-right">
-                        <button class="btn btn-default" data-toggle="modal" data-dismiss="modal" data-target="#loginModal">去登录</button>
-                        <button class="btn btn-primary" type="button" id="register" ng-click = "register()">注册</button>
+                        <button class="btn btn-default" type="button" data-toggle="modal" data-dismiss="modal" data-target="#loginModal">去登录</button>
+                        <button class="btn btn-primary" type="button" ng-click = "register()">注册</button>
                     </div>
                 </form>
             </div>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>个人中心</title>
+
+    <script type="text/javascript" src="/js/displayEffect.js"></script>
+    <script type="text/javascript" src="/js/dynamicLoading.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <script>
+        var username = document.getElementById("userName").innerText;
+        $(document).ready(function () {
+            if(username !== "用户"){
+                loginBtn("hidden");
+            }
+        })
+    </script>
+</head>
+
+<body>
+<p id = "userName" ><%= username%></p>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="col-md-4 navbar-header">
+                    <ul class="nav navbar-nav">
+                        <li><a onclick="window.location.href=''"><img src = "/images/logo.png"></a></li>
+                        <li><a onclick="window.location.href='/index'">返回主页</a></li>
+                        <li><a onclick="window.location.href='/lost'">失物招领</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-8">
+                    <ul class = "nav navbar-nav navbar-right" ng-controller="quitCtrl">
+                        <li id = "loginBtn"><a href="/register/index/login"><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
+                        <li id = "registerBtn" ><a href="/register/index/register"><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
+                        <li style = "display: none" id = "userBtn"><a onclick="window.location.href='/user'"><span id = "userName"><%= username%></span></a></li>
+                        <li style = "display: none" id = "quitBtn" ng-click="quit()"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-md-offset-2 col-md-8">
+            <!--日期、天气信息,给用户打个招呼-->
+            <div class="row clearfix" style="margin-bottom: 15px;">
+                <div class="col-md-8 column">
+                    <h4>18:42 星期五 3月23日 &nbsp;</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

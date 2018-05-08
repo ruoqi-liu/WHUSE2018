@@ -21,6 +21,13 @@
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
+        $(document).ready(function () {
+            document.getElementById("searchBtn").click();
+            if(document.getElementById("userName").innerText !== "用户"){
+                loginBtn("hidden");
+            }
+        })
+
         $(function(){
             $("#image").on("change",function () {
                 var dataURL;
@@ -105,13 +112,6 @@
                     )
                 }
             }])
-
-        $(document).ready(function () {
-            document.getElementById("searchBtn").click();
-            if(document.getElementById("userName").innerText !== "用户"){
-                loginBtn("hidden");
-            }
-        })
 
         let search = angular.module("search", []);
         search.controller("searchCtrl", ["$scope", "$http",

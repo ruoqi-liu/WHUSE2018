@@ -19,8 +19,14 @@
     <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
 
     <script>
-        //页面打开时自动加载需要显示的内容
         $(document).ready(function () {
+            if(document.getElementById("userName").innerText !== "用户"){
+                document.getElementById("sayHello").style.visibility = "visible";
+                loginBtn("hidden");
+            }
+            else{
+                document.getElementById("sayHello").style.visibility = "hidden";
+            }
             showNewsContent('news-content-1',
                 'card-label-color-blue',
                 '/images/0001.jpg',
@@ -51,10 +57,19 @@
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
                 '                    这是一个默认的引用实例。这是一个默认的引用实例。',
                 '/');
-            if(document.getElementById("userName").innerText !== "用户"){
-                loginBtn("hidden");
-            }
         })
+
+        let date = angular.module('date', []);
+        date.controller('dateCtrl', ['$scope', '$timeout', '$interval',
+            function($scope, $timeout, $interval){
+                $scope.now = new Date();
+                let timer = $interval(function () {
+                    $scope.now = new Date();
+                }, 1000);
+                $scope.stop = function(){
+                    $interval.cancel(timer);
+                }
+            }])
 
         let quit = angular.module('quit', []);
         quit.controller('quitCtrl', ['$scope', '$http',
@@ -64,41 +79,125 @@
                         method:'post',
                         url:'/user/logout'
                     }).then(
-                        function success(res) {
+                        function success() {
                             loginBtn("show");
+                            document.getElementById("sayHello").style.visibility = "hidden";
                         }
                     )
                 }
             }
         ])
 
-        angular.module('index.app', ['quit']);
+        let turn = angular.module('turn', []);
+        turn.controller('turnPageCtrl', ['$scope', '$http',
+            function ($scope, $http) {
+                $scope.upPage = function () {
+                    var curPage = document.getElementById("pageNum").innerText;
+                    curPage--;
+                    if(curPage === 0){
+                        alert("已经是第一页！");
+                        return;
+                    }
+                    $http({
+                        method:'get',
+                        url:'/posts/' + document.getElementById("typeSearch").value + '/' + curPage
+                    }).then(
+                        function success(res) {
+                            let resultArray = res.data.result;
+                            let length = resultArray.length;
+                            document.getElementById("lost-content-1").style.visibility = "hidden";
+                            document.getElementById("lost-content-2").style.visibility = "hidden";
+                            document.getElementById("lost-content-3").style.visibility = "hidden";
+                            let curResult;
+                            if(length !== 0) {
+                                curResult = resultArray[0];
+                                showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                                document.getElementById("lost-content-1").style.visibility = "visible";
+                                length--;
+                            }
+
+                            if(length !== 0) {
+                                curResult = resultArray[1];
+                                showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                                document.getElementById("lost-content-2").style.visibility = "visible";
+                                length--;
+                            }
+
+                            if(length !== 0) {
+                                curResult = resultArray[2];
+                                showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                                document.getElementById("lost-content-3").style.visibility = "visible";
+                            }
+                            document.getElementById("pageNum").innerText = curPage;
+                        }
+                    )
+                }
+                $scope.downPage = function () {
+                    var curPage = document.getElementById("pageNum").innerText;
+                    curPage++;
+                    $http({
+                        method:'get',
+                        url:'/posts/' + document.getElementById("typeSearch").value + '/' + curPage
+                    }).then(
+                        function success(res) {
+                            let resultArray = res.data.result;
+                            let length = resultArray.length;
+                            if(length === 0){
+                                alert("已经到最后一页！");
+                                return;
+                            }
+                            document.getElementById("lost-content-1").style.visibility = "hidden";
+                            document.getElementById("lost-content-2").style.visibility = "hidden";
+                            document.getElementById("lost-content-3").style.visibility = "hidden";
+                            let curResult;
+                            if(length !== 0) {
+                                curResult = resultArray[0];
+                                showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                                document.getElementById("lost-content-1").style.visibility = "visible";
+                                length--;
+                            }
+
+                            if(length !== 0) {
+                                curResult = resultArray[1];
+                                showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                                document.getElementById("lost-content-2").style.visibility = "visible";
+                                length--;
+                            }
+
+                            if(length !== 0) {
+                                curResult = resultArray[2];
+                                showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+                                document.getElementById("lost-content-3").style.visibility = "visible";
+                            }
+                            document.getElementById("pageNum").innerText = curPage;
+                        }
+                    )
+                }
+            }
+        ])
+
+        angular.module('indexApp', ['quit', 'date', 'turn']);
     </script>
 </head>
 
-<body ng-app="index.app">
-
+<body ng-app="indexApp">
 <div class="container">
     <div class="row clearfix">
         <div class="col-md-12 column">
-            <nav class="navbar navbar-default navbar-inverse" role="navigation">
-                <!--Logo,跳转到首页-->
+            <nav class="navbar navbar-default" role="navigation">
                 <div class="col-md-4 navbar-header">
-                    <!--页面导航，返回主页或者跳到失物招领页，首页即为当前页面-->
                     <ul class="nav navbar-nav">
-                        <li><a href = "/"><img src = "/images/logo.png"></a></li>
-                        <li class="active"><a href="/index">返回主页</a></li>
-                        <li><a href="/lost">失物招领</a></li>
+                        <li><a onclick="window.location.href=''"><img src = "/images/logo.png"></a></li>
+                        <li class="active"><a onclick="window.location.href='/index'">返回主页</a></li>
+                        <li><a onclick="window.location.href='/lost'">失物招领</a></li>
                     </ul>
                 </div>
-                <!--页面功能导航-->
                 <div class="col-md-8">
-                    <!--登录相关按钮-->
                     <ul class = "nav navbar-nav navbar-right" ng-controller="quitCtrl">
-                        <li id = "loginBtn"><a href="/register/index/login"><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
-                        <li id = "registerBtn" ><a href="/register/index/register"><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
-                        <li style = "display: none" id = "userBtn"><a><span id = "userName"><%= username%></span></a></li>
-                        <li style = "display: none" id = "quitBtn" ng-click="quit()"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
+                        <li id = "loginBtn"><a onclick="window.location.href='/register/index/login'"><span class = "fa fa-sign-in">&nbsp&nbsp登录</span></a></li>
+                        <li id = "registerBtn"><a onclick="window.location.href='/register/index/register'"><span class = "fa fa-pencil">&nbsp&nbsp注册</span></a></li>
+                        <li id = "userBtn" style = "display: none"><a><span id = "userName"><%= username%></span></a></li>
+                        <li id = "quitBtn" style = "display: none" ng-click="quit()"><a><span class = "fa fa-sign-out">&nbsp&nbsp退出</span></a></li>
                     </ul>
                 </div>
             </nav>
@@ -106,12 +205,10 @@
     </div>
     <div class="row clearfix">
         <div class="col-md-offset-2 col-md-8">
-            <!--日期、天气信息,给用户打个招呼-->
             <div class="row clearfix" style="margin-bottom: 15px;">
-                <div class="col-md-7 column">
-                    <h4>18:42 星期五 3月23日 &nbsp;</h4>
-                </div>
-                <div id = "tags" class="col-md-5 column" style="text-align:right; display:none;">
+                <div class="col-md-8 column" ng-controller="dateCtrl">
+                    <h4 style="display:inline-block">{{now|date:'yyyy-MM-dd HH:mm:ss'}}</h4>
+                    <h4 id = "sayHello" style="display:inline-block">&nbsp&nbsp&nbsp&nbsp你好，<%= username%></h4>
                 </div>
             </div>
 
@@ -127,16 +224,18 @@
     </div>
     &nbsp;
     <div class="row clearfix">
-        <div class="col-md-4 column">
-        </div>
-        <div class="col-md-4 column">
-            <ul class="pager">
-                <li class="previous"><a href="">&larr; 上一页</a></li>
-                <p id = "pageNum">1</p>
-                <li class="next"><a href="">下一页 &rarr;</a></li>
+        <div class="col-md-offset-3 col-md-8 column">
+            <ul class="pager" ng-controller="turnPageCtrl">
+                <div class = "col-md-3">
+                    <li class="previous"><a id = "upPage" ng-click="upPage()">&larr; 上一页</a></li>
+                </div>
+                <div class = "col-md-3">
+                    <li class = "pagination"><a id = "pageNum">1</a></li>
+                </div>
+                <div class = "col-md-3">
+                    <li class="next"><a id = "downPage" ng-click="downPage()">下一页 &rarr;</a></li>
+                </div>
             </ul>
-        </div>
-        <div class="col-md-4 column">
         </div>
     </div>
 </div>
