@@ -21,42 +21,14 @@
     <script>
         $(document).ready(function () {
             if(document.getElementById("userName").innerText !== "用户"){
+                document.getElementById("searchUserBtn").click();
                 document.getElementById("sayHello").style.visibility = "visible";
                 loginBtn("hidden");
             }
             else{
+                document.getElementById("searchAllBtn").click();
                 document.getElementById("sayHello").style.visibility = "hidden";
             }
-            showNewsContent('news-content-1',
-                'card-label-color-blue',
-                '/images/0001.jpg',
-                '【珞珈讲坛】萱萱院士谈现代宇宙学',
-                '  03/01/2018',
-                '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-                '                    这是一个默认的引用实例。这是一个默认的引用实例。',
-                '/lost/lost/1');
-            showNewsContent('news-content-2',
-                'card-label-color-blue',
-                '/images/0001.jpg',
-                '【珞珈讲坛】萱萱院士谈现代宇宙学',
-                '  03/01/2018',
-                '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-                '                    这是一个默认的引用实例。这是一个默认的引用实例。',
-                '/index');
-            showNewsContent('news-content-3',
-                'card-label-color-blue',
-                '/images/0001.jpg',
-                '【珞珈讲坛】萱萱院士谈现代宇宙学',
-                '  03/01/2018',
-                '这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-                '                    这是一个默认的引用实例。这是一个默认的引用实例。\n'+
-                '                    这是一个默认的引用实例。这是一个默认的引用实例。',
-                '/');
         })
 
         let date = angular.module('date', []);
@@ -69,7 +41,8 @@
                 $scope.stop = function(){
                     $interval.cancel(timer);
                 }
-            }])
+            }]
+        )
 
         let quit = angular.module('quit', []);
         quit.controller('quitCtrl', ['$scope', '$http',
@@ -80,103 +53,104 @@
                         url:'/user/logout'
                     }).then(
                         function success() {
-                            loginBtn("show");
-                            document.getElementById("sayHello").style.visibility = "hidden";
+                            if (res.data.islogout === "1") {
+                                loginBtn("show");
+                                window.location.href = '';
+                            }
                         }
                     )
                 }
             }
         ])
 
+        let search = angular.module('search', []);
+        search.controller('searchCtrl', ['$scope', '$http',
+            function ($scope, $http) {
+            $scope.searchAll = function () {
+                $http({
+                    method :'get',
+                    url:'/news/' + document.getElementById("pageSearch").innerText
+                }).then(
+                    function success(res) {
+                        showNews(res);
+                        document.getElementById("pageSearch").innerText = '1';
+                    })
+            }
+            $scope.searchUser = function () {
+                $http({
+                    method : 'post',
+                    url:'/news/' + document.getElementById("userName").innerText + '/' + document.getElementById("pageSearch").innerText
+                }).then(
+                    function success(res) {
+                        showNews(res);
+                        document.getElementById("pageSearch").innerText = '1';
+                    }
+                )
+            }
+            $scope.search = function () {
+                if(document.getElementById("titleSearch").value === ""){
+                    alert("搜索内容不能为空");
+                    return;
+                }
+                document.getElementById("pageSearch").innerText = "1";
+                $http({
+                    method : 'post',
+                    url : '/news/search/' + document.getElementById("pageSearch").innerText,
+                    data : {
+                        searchText : document.getElementById("titleSearch").value
+                    }
+                }).then(
+                    function success(res) {
+                        showNews(res);
+                        document.getElementById("pageSearch").innerText = '1';
+                    }
+                )
+            }
+        }])
+
         let turn = angular.module('turn', []);
-        turn.controller('turnPageCtrl', ['$scope', '$http',
+        turn.controller('turnPageCtrl', ['$scope','$http',
             function ($scope, $http) {
                 $scope.upPage = function () {
-                    var curPage = document.getElementById("pageNum").innerText;
+                    var curPage = document.getElementById("pageSearch").innerText;
                     curPage--;
                     if(curPage === 0){
-                        alert("已经是第一页！");
+                        alert("已经是第一页");
                         return;
                     }
                     $http({
-                        method:'get',
-                        url:'/posts/' + document.getElementById("typeSearch").value + '/' + curPage
+                        method : 'post',
+                        url : '/news/search/' + curPage,
+                        data : {
+                            searchText : document.getElementById("titleSearch").value
+                        }
                     }).then(
                         function success(res) {
-                            let resultArray = res.data.result;
-                            let length = resultArray.length;
-                            document.getElementById("lost-content-1").style.visibility = "hidden";
-                            document.getElementById("lost-content-2").style.visibility = "hidden";
-                            document.getElementById("lost-content-3").style.visibility = "hidden";
-                            let curResult;
-                            if(length !== 0) {
-                                curResult = resultArray[0];
-                                showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                                document.getElementById("lost-content-1").style.visibility = "visible";
-                                length--;
-                            }
-
-                            if(length !== 0) {
-                                curResult = resultArray[1];
-                                showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                                document.getElementById("lost-content-2").style.visibility = "visible";
-                                length--;
-                            }
-
-                            if(length !== 0) {
-                                curResult = resultArray[2];
-                                showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                                document.getElementById("lost-content-3").style.visibility = "visible";
-                            }
-                            document.getElementById("pageNum").innerText = curPage;
+                            showNews(res);
+                            document.getElementById("pageSearch").innerText--;
                         }
                     )
                 }
                 $scope.downPage = function () {
-                    var curPage = document.getElementById("pageNum").innerText;
+                    var curPage = document.getElementById("pageSearch").innerText;
                     curPage++;
                     $http({
-                        method:'get',
-                        url:'/posts/' + document.getElementById("typeSearch").value + '/' + curPage
+                        method : 'post',
+                        url : '/news/search/' + curPage,
+                        data : {
+                            searchText : document.getElementById("titleSearch").value
+                        }
                     }).then(
                         function success(res) {
-                            let resultArray = res.data.result;
-                            let length = resultArray.length;
-                            if(length === 0){
-                                alert("已经到最后一页！");
-                                return;
-                            }
-                            document.getElementById("lost-content-1").style.visibility = "hidden";
-                            document.getElementById("lost-content-2").style.visibility = "hidden";
-                            document.getElementById("lost-content-3").style.visibility = "hidden";
-                            let curResult;
-                            if(length !== 0) {
-                                curResult = resultArray[0];
-                                showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                                document.getElementById("lost-content-1").style.visibility = "visible";
-                                length--;
-                            }
-
-                            if(length !== 0) {
-                                curResult = resultArray[1];
-                                showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                                document.getElementById("lost-content-2").style.visibility = "visible";
-                                length--;
-                            }
-
-                            if(length !== 0) {
-                                curResult = resultArray[2];
-                                showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                                document.getElementById("lost-content-3").style.visibility = "visible";
-                            }
-                            document.getElementById("pageNum").innerText = curPage;
+                            showNews(res);
+                            document.getElementById("pageSearch").innerText++;
                         }
                     )
                 }
             }
         ])
 
-        angular.module('indexApp', ['quit', 'date', 'turn']);
+        angular.module('indexApp', ['quit', 'date', 'turn', 'search']);
     </script>
 </head>
 
@@ -188,7 +162,7 @@
                 <div class="col-md-4 navbar-header">
                     <ul class="nav navbar-nav">
                         <li><a onclick="window.location.href=''"><img src = "/images/logo.png"></a></li>
-                        <li class="active"><a onclick="window.location.href='/index'">返回主页</a></li>
+                        <li class="active"><a onclick="window.location.href=''">返回主页</a></li>
                         <li><a onclick="window.location.href='/lost'">失物招领</a></li>
                     </ul>
                 </div>
@@ -210,27 +184,36 @@
                     <h4 style="display:inline-block">{{now|date:'yyyy-MM-dd HH:mm:ss'}}</h4>
                     <h4 id = "sayHello" style="display:inline-block">&nbsp&nbsp&nbsp&nbsp你好，<%= username%></h4>
                 </div>
+
+                <div class = "col-md-4 column" ng-controller="searchCtrl">
+                    <div class = "input-group">
+                        <input id = "titleSearch" type = "text" class = "form-control" title="搜索" value="">
+                        <span class = "input-group-btn"><button id = "searchBtn" class = "btn btn-default" type = "button" ng-click="search()">搜索</button></span>
+                        <button id = "searchAllBtn" style="display:none;" ng-click="searchAll()"></button>
+                        <button id = "searchUserBtn" style="display:none;" ng-click="searchUser()"></button>
+                    </div>
+                </div>
             </div>
 
-            <div class="content card-frame" id="news-content-1" style="display: none">
+            <div class="content card-frame" id="news-content-1">
             </div>
             &nbsp;
-            <div class="content card-frame" id="news-content-2" style="display: none">
+            <div class="content card-frame" id="news-content-2">
             </div>
             &nbsp;
-            <div class="content card-frame" id="news-content-3" style="display: none">
+            <div class="content card-frame" id="news-content-3">
             </div>
         </div>
     </div>
     &nbsp;
     <div class="row clearfix">
-        <div class="col-md-offset-3 col-md-8 column">
+        <div class="col-md-offset-3 col-md-9 column">
             <ul class="pager" ng-controller="turnPageCtrl">
                 <div class = "col-md-3">
                     <li class="previous"><a id = "upPage" ng-click="upPage()">&larr; 上一页</a></li>
                 </div>
-                <div class = "col-md-3">
-                    <li class = "pagination"><a id = "pageNum">1</a></li>
+                <div class = "col-md-2">
+                    <li class = "pagination"><a id = "pageSearch">0</a></li>
                 </div>
                 <div class = "col-md-3">
                     <li class="next"><a id = "downPage" ng-click="downPage()">下一页 &rarr;</a></li>

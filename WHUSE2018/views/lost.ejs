@@ -20,13 +20,8 @@
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
-        var curPage;
-        let curResult;
-        let resultArray;
-        let length;
-
         $(document).ready(function () {
-            document.getElementById("searchBtn").click();
+            document.getElementById("searchAllBtn").click();
             if(document.getElementById("userName").innerText !== "用户"){
                 document.getElementById("sayHello").style.visibility = "visible";
                 loginBtn("hidden");
@@ -129,6 +124,10 @@
         search.controller("searchCtrl", ["$scope", "$http",
             function ($scope, $http) {
                 $scope.search = function () {
+                    if(document.getElementById("titleSearch").value === ""){
+                        alert("搜索内容不能为空");
+                        return;
+                    }
                     document.getElementById("pageSearch").innerText = "1";
                     $http({
                         method: 'post',
@@ -138,29 +137,18 @@
                         }
                     }).then(
                         function success(res) {
-                            document.getElementById("lost-content-1").style.visibility = "hidden";
-                            document.getElementById("lost-content-2").style.visibility = "hidden";
-                            document.getElementById("lost-content-3").style.visibility = "hidden";
-                            resultArray = res.data.result;
-                            length = resultArray.length;
-                            if(length !== 0) {
-                                curResult = resultArray[0];
-                                showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                                document.getElementById("lost-content-1").style.visibility = "visible";
-                                length--;
-                            }
-                            if(length !== 0) {
-                                curResult = resultArray[1];
-                                showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                                document.getElementById("lost-content-2").style.visibility = "visible";
-                                length--;
-                            }
-                            if(length !== 0) {
-                                curResult = resultArray[2];
-                                showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                                document.getElementById("lost-content-3").style.visibility = "visible";
-                            }
+                            showLost(res);
                         })
+                }
+                $scope.searchAll = function () {
+                    $http({
+                        method:'get',
+                        url:'/posts/' + document.getElementById("typeSearch").value + '/' + document.getElementById("pageSearch").innerText
+                    }).then(
+                        function success(res) {
+                            showLost(res);
+                        }
+                    )
                 }
         }])
 
@@ -176,7 +164,7 @@
                     function success(res) {
                         if(res.data.islogout === "1"){
                             loginBtn("show")
-                            document.getElementById("sayHello").style.visibility = "hidden";
+                            window.location.href = '';
                         }
                     }
                 )
@@ -187,10 +175,10 @@
         turn.controller('turnPageCtrl', ['$scope', '$http',
             function ($scope, $http) {
             $scope.upPage = function () {
-                curPage = document.getElementById("pageSearch").innerText;
+                var curPage = document.getElementById("pageSearch").innerText;
                 curPage--;
                 if(curPage === 0){
-                    alert("已经是第一页！");
+                    alert("已经是第一页");
                     return;
                 }
                 $http({
@@ -201,37 +189,13 @@
                     }
                 }).then(
                     function success(res) {
-                        resultArray = res.data.result;
-                        length = resultArray.length;
-                        document.getElementById("lost-content-1").style.visibility = "hidden";
-                        document.getElementById("lost-content-2").style.visibility = "hidden";
-                        document.getElementById("lost-content-3").style.visibility = "hidden";
-                        if(length !== 0) {
-                            curResult = resultArray[0];
-                            showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                            document.getElementById("lost-content-1").style.visibility = "visible";
-                            length--;
-                        }
-
-                        if(length !== 0) {
-                            curResult = resultArray[1];
-                            showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                            document.getElementById("lost-content-2").style.visibility = "visible";
-                            length--;
-                        }
-
-                        if(length !== 0) {
-                            curResult = resultArray[2];
-                            showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                            document.getElementById("lost-content-3").style.visibility = "visible";
-                        }
-                        document.getElementById("pageSearch").innerText = curPage;
+                       showLost(res);
+                        document.getElementById("pageSearch").innerText--;
                     }
                 )
             }
             $scope.downPage = function () {
-                curPage = document.getElementById("pageSearch").innerText;
-                curPage++;
+                var curPage = document.getElementById("pageSearch").innerText;
                 $http({
                     method:'post',
                     url:'/posts/search/' + document.getElementById("typeSearch").value + '/' + curPage,
@@ -240,36 +204,9 @@
                     }
                 }).then(
                     function success(res) {
-                        resultArray = res.data.result;
-                        length = resultArray.length;
-                        if(length === 0){
-                            alert("已经到最后一页！");
-                            return;
-                        }
-                        document.getElementById("lost-content-1").style.visibility = "hidden";
-                        document.getElementById("lost-content-2").style.visibility = "hidden";
-                        document.getElementById("lost-content-3").style.visibility = "hidden";
-                        let curResult;
-                        if(length !== 0) {
-                            curResult = resultArray[0];
-                            showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                            document.getElementById("lost-content-1").style.visibility = "visible";
-                            length--;
-                        }
-
-                        if(length !== 0) {
-                            curResult = resultArray[1];
-                            showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                            document.getElementById("lost-content-2").style.visibility = "visible";
-                            length--;
-                        }
-
-                        if(length !== 0) {
-                            curResult = resultArray[2];
-                            showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
-                            document.getElementById("lost-content-3").style.visibility = "visible";
-                        }
-                        document.getElementById("pageSearch").innerText = curPage;
+                        alert(JSON.stringify(res));
+                       showLost(res);
+                       document.getElementById("pageSearch").innerText++;
                     }
                 )
             }
@@ -301,7 +238,7 @@
                     <ul class="nav navbar-nav">
                         <li><a onclick="window.location.href=''"><img src = "/images/logo.png"></a></li>
                         <li><a onclick="window.location.href='/index'">返回主页</a></li>
-                        <li class="active"><a onclick="window.location.href='/lost'">失物招领</a></li>
+                        <li class="active"><a onclick="window.location.href=''">失物招领</a></li>
                     </ul>
                 </div>
                 <div class="col-md-8">
@@ -309,7 +246,7 @@
                         <button id = "publishBtn" type = "button" class = "btn btn-default navbar-btn navbar-middle" data-toggle = modal data-target = #lostModal>
                             <span class = "fa fa-edit">&nbsp发布</span>
                         </button>&nbsp&nbsp&nbsp
-                        <button id = "listBtn" type = "button" class = "btn btn-default navbar-btn navbar-middle active" onclick = "clicked('list', 'map')">
+                        <button id = "listBtn" type = "button" class = "btn btn-default navbar-btn navbar-middle" onclick = "clicked('list', 'map')">
                             <span class = "fa fa-list-ul">&nbsp列表</span>
                         </button>&nbsp&nbsp&nbsp
                         <button id = "mapBtn" type = "button" class = "btn btn-default navbar-btn navbar-middle" onclick = "clicked('map', 'list')">
@@ -390,24 +327,27 @@
         </div>
     </div>
     <div class="row clearfix">
-        <div class="col-md-offset-2 col-md-8" ng-controller="searchCtrl">
+        <div class="col-md-offset-2 col-md-8">
             <div class="row clearfix" style="margin-bottom: 15px;">
                 <div class="col-md-6 column" ng-controller="dateCtrl">
                     <h4 style="display:inline-block">{{now|date:'yyyy-MM-dd HH:mm:ss'}}</h4>
                     <h4 id = "sayHello" style="display:inline-block">&nbsp&nbsp&nbsp&nbsp你好，<%= username%></h4>
                 </div>
 
-                <div class = "col-md-3 column">
-                    <select id = "typeSearch" class = "form-control" title="">
-                        <option value = "lost">寻找失物</option>
-                        <option value = "found">寻找失主</option>
-                    </select>
-                </div>
+                <div ng-controller="searchCtrl">
+                    <div class = "col-md-3 column">
+                        <select id = "typeSearch" class = "form-control" title="">
+                            <option value = "lost">寻找失物</option>
+                            <option value = "found">寻找失主</option>
+                        </select>
+                    </div>
 
-                <div class = "col-md-3 column">
-                    <div class = "input-group">
-                        <input id = "titleSearch" type = "text" class = "form-control" title="搜索" value="校园卡">
-                        <span class = "input-group-btn"><button id = "searchBtn" class = "btn btn-default" type = "button" ng-click="search()">搜索</button></span>
+                    <div class = "col-md-3 column">
+                        <div class = "input-group">
+                            <input id = "titleSearch" type = "text" class = "form-control" title="搜索" value="">
+                            <span class = "input-group-btn"><button id = "searchBtn" class = "btn btn-default" type = "button" ng-click="search()">搜索</button></span>
+                            <button id = "searchAllBtn" style="display:none;" ng-click="searchAll()"></button>
+                        </div>
                     </div>
                 </div>
             </div>

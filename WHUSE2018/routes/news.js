@@ -21,11 +21,14 @@ router.post('/search/:page', function (req, res, next) {
     var skipNum = (page - 1) * eachPageNum;
     if (skipNum < 0) skipNum = 0;
     var textParts = defaultSegment(req.body.searchText);
-    newsCollection.find({ 'faculty': { $in: req.body.faculty }, 'tags': { $in: textParts } }, { fields: { tags: 0 }, sort: { date: -1 }, limit: limitNum ,skip:skipNum}).then(results => {
+    var faculty = req.body.faculty;
+    var query = { 'faculty': { '$in': faculty }, 'tags': { '$in': textParts } };
+    if(!faculty||faculty.length == 0) delete query['faculty'];
+    newsCollection.find(query, { fields: { tags: 0 }, sort: { date: -1 }, limit: limitNum ,skip:skipNum}).then(results => {
         res.send({ 'searchnews': '1', 'news': results });
         return;
     }).catch(err => {
-        req.send({ 'searchnews': '0', message: 'db error.' });
+        res.send({ 'searchnews': '0', message: 'db error.' });
         console.log(err);
         });
 });
