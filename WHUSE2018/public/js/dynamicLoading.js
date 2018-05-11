@@ -109,3 +109,7 @@ function showLost(res) {
         document.getElementById("lost-content-3").style.visibility = "visible";
     }
 }
+
+function showUser(res) {
+
+}

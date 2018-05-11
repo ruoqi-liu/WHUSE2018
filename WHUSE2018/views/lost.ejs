@@ -161,11 +161,9 @@
                     method:'post',
                     url:'/user/logout'
                 }).then(
-                    function success(res) {
-                        if(res.data.islogout === "1"){
-                            loginBtn("show")
-                            window.location.href = '';
-                        }
+                    function success() {
+                        loginBtn("show");
+                        window.location.href = '';
                     }
                 )
             }}
@@ -181,34 +179,62 @@
                     alert("已经是第一页");
                     return;
                 }
-                $http({
-                    method:'post',
-                    url:'/posts/search/' + document.getElementById("typeSearch").value + '/' + curPage,
-                    data: {
-                        text: document.getElementById("titleSearch").value
-                    }
-                }).then(
-                    function success(res) {
-                       showLost(res);
-                        document.getElementById("pageSearch").innerText--;
-                    }
-                )
+                var searchText = document.getElementById("titleSearch").value;
+                if(searchText === ''){
+                    $http({
+                        method : 'get',
+                        url : '/posts/' + document.getElementById("typeSearch").value + '/' + curPage,
+                    }).then(
+                        function success(res) {
+                            showLost(res);
+                            document.getElementById("pageSearch").innerText--;
+                        }
+                    )
+                }
+                else{
+                    $http({
+                        method:'post',
+                        url:'/posts/search/' + document.getElementById("typeSearch").value + '/' + curPage,
+                        data: {
+                            text: searchText
+                        }
+                    }).then(
+                        function success(res) {
+                            showLost(res);
+                            document.getElementById("pageSearch").innerText--;
+                        }
+                    )
+                }
             }
             $scope.downPage = function () {
                 var curPage = document.getElementById("pageSearch").innerText;
-                $http({
-                    method:'post',
-                    url:'/posts/search/' + document.getElementById("typeSearch").value + '/' + curPage,
-                    data: {
-                        text: document.getElementById("titleSearch").value
-                    }
-                }).then(
-                    function success(res) {
-                        alert(JSON.stringify(res));
-                       showLost(res);
-                       document.getElementById("pageSearch").innerText++;
-                    }
-                )
+                curPage++;
+                var searchText = document.getElementById("titleSearch").value;
+                if(searchText === ''){
+                    $http({
+                        method : 'get',
+                        url : '/posts/' + document.getElementById("typeSearch").value + '/' + curPage,
+                    }).then(
+                        function success(res) {
+                            showLost(res);
+                            document.getElementById("pageSearch").innerText++;
+                        }
+                    )
+                }
+                else{
+                    $http({
+                        method:'post',
+                        url:'/posts/search/' + document.getElementById("typeSearch").value + '/' + curPage,
+                        data: {
+                            text: searchText
+                        }
+                    }).then(
+                        function success(res) {
+                            showLost(res);
+                            document.getElementById("pageSearch").innerText++;
+                        }
+                    )
+                }
             }
         }
         ])

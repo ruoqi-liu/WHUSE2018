@@ -102,7 +102,10 @@ router.put('/:name', isAuthentic, function (req, res, next) {//update username o
                 else
                     res.send({ 'isupdate': '0', 'message': 'unkonwn' });
             else if (result.ok == 1)
+            {
+                req.user.username = content.name;
                 res.send({ 'isupdate': '1' });
+            }
             else
                 res.send({ 'isupdate': '0', 'message': 'password no change' });
             return;
@@ -135,7 +138,9 @@ router.get('/:name', isAuthentic, userNameVerify, function (req, res, next) {//u
         doc = doc[0];
         req.flash('userdoc', doc);
         var postids = doc.postid;
-        postCollection.find({ '_id': { $in: postids } }, { /*fields: { title: 1 }*/limit: limitNum }).then((posts) => {
+        if(!postids) postids = [];
+
+        postCollection.find({ '_id': { '$in': postids } }, { /*fields: { title: 1 }*//*limit: limitNum*/ }).then((posts) => {
             delete doc['postid'];
             doc['posts'] = posts;//posts: array of post
             return res.send({ 'getuser': '1', user: doc });

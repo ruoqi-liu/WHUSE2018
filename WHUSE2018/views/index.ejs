@@ -53,10 +53,8 @@
                         url:'/user/logout'
                     }).then(
                         function success() {
-                            if (res.data.islogout === "1") {
-                                loginBtn("show");
-                                window.location.href = '';
-                            }
+                            loginBtn("show");
+                            window.location.href = '';
                         }
                     )
                 }
@@ -118,34 +116,63 @@
                         alert("已经是第一页");
                         return;
                     }
-                    $http({
-                        method : 'post',
-                        url : '/news/search/' + curPage,
-                        data : {
-                            searchText : document.getElementById("titleSearch").value
-                        }
-                    }).then(
-                        function success(res) {
-                            showNews(res);
-                            document.getElementById("pageSearch").innerText--;
-                        }
-                    )
+                    var searchText = document.getElementById('titleSearch').value;
+                    if(searchText === ''){
+                        $http({
+                            method : 'get',
+                            url : '/news/' + curPage
+                        }).then(
+                            function success(res) {
+                                showNews(res);
+                                document.getElementById("pageSearch").innerText--;
+                            }
+                        )
+                    }
+                    else {
+                        $http({
+                            method: 'post',
+                            url: '/news/search/' + curPage,
+                            data: {
+                                searchText: searchText
+                            }
+                        }).then(
+                            function success(res) {
+                                showNews(res);
+                                document.getElementById("pageSearch").innerText--;
+                            }
+                        )
+                    }
                 }
                 $scope.downPage = function () {
                     var curPage = document.getElementById("pageSearch").innerText;
                     curPage++;
-                    $http({
-                        method : 'post',
-                        url : '/news/search/' + curPage,
-                        data : {
-                            searchText : document.getElementById("titleSearch").value
-                        }
-                    }).then(
-                        function success(res) {
-                            showNews(res);
-                            document.getElementById("pageSearch").innerText++;
-                        }
-                    )
+                    var searchText = document.getElementById('titleSearch').value;
+                    if(searchText === ''){
+                        $http({
+                            method : 'get',
+                            url : '/news/' + curPage
+                        }).then(
+                            function success(res) {
+                                showNews(res);
+                                document.getElementById("pageSearch").innerText++;
+                            }
+                        )
+                    }
+                    else{
+                        $http({
+                            method : 'post',
+                            url : '/news/search/' + curPage,
+                            data : {
+                                searchText : searchText
+                            }
+                        }).then(
+                            function success(res) {
+                                showNews(res);
+                                document.getElementById("pageSearch").innerText++;
+                            }
+                        )
+                    }
+
                 }
             }
         ])
