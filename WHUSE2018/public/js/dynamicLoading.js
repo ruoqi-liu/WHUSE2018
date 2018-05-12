@@ -32,11 +32,6 @@ function showNewsContent(id, color, image, title, time, content, newsLink){
 function showNews(res){
     let resultArray = res.data.news;
     let length = resultArray.length;
-    if(length === 0){
-        alert("没有可显示的内容！");
-        document.getElementById("pageSearch").innerText--;
-        return;
-    }
     document.getElementById("news-content-1").style.visibility = "hidden";
     document.getElementById("news-content-2").style.visibility = "hidden";
     document.getElementById("news-content-3").style.visibility = "hidden";
@@ -82,11 +77,6 @@ function showLostContent(id, color, image, title, time, content){
 function showLost(res) {
     let resultArray = res.data.result;
     let length = resultArray.length;
-    if(length === 0) {
-        alert("没有可显示的内容！");
-        document.getElementById("pageSearch").innerText--;
-        return;
-    }
     document.getElementById("lost-content-1").style.visibility = "hidden";
     document.getElementById("lost-content-2").style.visibility = "hidden";
     document.getElementById("lost-content-3").style.visibility = "hidden";

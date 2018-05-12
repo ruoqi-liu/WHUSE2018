@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
+        var curType;
         $(document).ready(function () {
             document.getElementById("searchAllBtn").click();
             if(document.getElementById("userName").innerText !== "用户"){
@@ -125,28 +126,54 @@
             function ($scope, $http) {
                 $scope.search = function () {
                     if(document.getElementById("titleSearch").value === ""){
-                        alert("搜索内容不能为空");
-                        return;
+                        curType = "all";
+                        $http({
+                            method:'get',
+                            url:'/posts/' + document.getElementById("typeSearch").value + '/1'
+                        }).then(
+                            function success(res) {
+                                if(res.data.result.length !== 0){
+                                    showLost(res);
+                                }
+                                else{
+                                    alert("没有更多内容了");
+                                }
+                            }
+                        )
                     }
-                    document.getElementById("pageSearch").innerText = "1";
-                    $http({
-                        method: 'post',
-                        url: '/posts/search/' + document.getElementById("typeSearch").value + '/' + document.getElementById("pageSearch").innerText,
-                        data: {
-                            text: document.getElementById("titleSearch").value
-                        }
-                    }).then(
-                        function success(res) {
-                            showLost(res);
-                        })
+                    else{
+                        curType = "text";
+                        $http({
+                            method: 'post',
+                            url: '/posts/search/' + document.getElementById("typeSearch").value + '/1',
+                            data: {
+                                text: document.getElementById("titleSearch").value
+                            }
+                        }).then(
+                            function success(res) {
+                                if(res.data.result.length !== 0){
+                                    showLost(res);
+                                }
+                                else{
+                                    alert("没有更多内容了");
+                                }
+                            }
+                        )
+                    }
                 }
                 $scope.searchAll = function () {
+                    curType = "all";
                     $http({
                         method:'get',
-                        url:'/posts/' + document.getElementById("typeSearch").value + '/' + document.getElementById("pageSearch").innerText
+                        url:'/posts/' + document.getElementById("typeSearch").value + '/1'
                     }).then(
                         function success(res) {
-                            showLost(res);
+                            if(res.data.result.length !== 0){
+                                showLost(res);
+                            }
+                            else{
+                                alert("没有更多内容了");
+                            }
                         }
                     )
                 }
@@ -179,29 +206,38 @@
                     alert("已经是第一页");
                     return;
                 }
-                var searchText = document.getElementById("titleSearch").value;
-                if(searchText === ''){
+                if(curType === "all"){
                     $http({
-                        method : 'get',
-                        url : '/posts/' + document.getElementById("typeSearch").value + '/' + curPage,
+                        method:'get',
+                        url:'/posts/' + document.getElementById("typeSearch").value + '/' + curPage
                     }).then(
                         function success(res) {
-                            showLost(res);
-                            document.getElementById("pageSearch").innerText--;
+                            if(res.data.result.length !== 0){
+                                document.getElementById("pageSearch").innerText--;
+                                showLost(res);
+                            }
+                            else{
+                                alert("没有更多内容了");
+                            }
                         }
                     )
                 }
-                else{
+                else if (curType === "text"){
                     $http({
                         method:'post',
                         url:'/posts/search/' + document.getElementById("typeSearch").value + '/' + curPage,
                         data: {
-                            text: searchText
+                            text: document.getElementById("titleSearch").value
                         }
                     }).then(
                         function success(res) {
-                            showLost(res);
-                            document.getElementById("pageSearch").innerText--;
+                            if(res.data.result.length !== 0){
+                                document.getElementById("pageSearch").innerText--;
+                                showLost(res);
+                            }
+                            else{
+                                alert("没有更多内容了");
+                            }
                         }
                     )
                 }
@@ -209,29 +245,38 @@
             $scope.downPage = function () {
                 var curPage = document.getElementById("pageSearch").innerText;
                 curPage++;
-                var searchText = document.getElementById("titleSearch").value;
-                if(searchText === ''){
+                if(curType === "all"){
                     $http({
                         method : 'get',
-                        url : '/posts/' + document.getElementById("typeSearch").value + '/' + curPage,
+                        url : '/posts/' + document.getElementById("typeSearch").value + '/' + curPage
                     }).then(
                         function success(res) {
-                            showLost(res);
-                            document.getElementById("pageSearch").innerText++;
+                            if(res.data.result.length !== 0){
+                                document.getElementById("pageSearch").innerText++;
+                                showLost(res);
+                            }
+                            else{
+                                alert("没有更多内容了");
+                            }
                         }
                     )
                 }
-                else{
+                else if (curType === "text"){
                     $http({
                         method:'post',
                         url:'/posts/search/' + document.getElementById("typeSearch").value + '/' + curPage,
                         data: {
-                            text: searchText
+                            text: document.getElementById("titleSearch").value
                         }
                     }).then(
                         function success(res) {
-                            showLost(res);
-                            document.getElementById("pageSearch").innerText++;
+                            if(res.data.result.length !== 0){
+                                document.getElementById("pageSearch").innerText++;
+                                showLost(res);
+                            }
+                            else{
+                                alert("没有更多内容了");
+                            }
                         }
                     )
                 }
