@@ -120,15 +120,17 @@ router.put('/:name', isAuthentic, function (req, res, next) {//update username o
 
 
 //required body.password
-router.delete('/:name', isAuthentic, function (req, res, next) {//delete
-    collection.remove({ name: req.params.name, password: req.body.password }, function (err, result) {
+router.delete('/:name/:password', isAuthentic, function (req, res, next) {//delete
+
+    collection.remove({ name: req.params.name, password: req.params.password }, function (err, result) {
         if (err) {
             res.send({ 'isdelete': '0', 'message': 'unknown' });
             return;
         }
+        console.log(result.result);
         if (result.result.n == 1) {
-            res.send({ 'isdelete': '1' });
             req.logout();
+            res.send({ 'isdelete': '1' });
             //console.log(req.user);
         }
         else

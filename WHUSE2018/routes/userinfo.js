@@ -30,17 +30,19 @@ router.get('/:name', isAuthentic,userNameVerify,function (req, res, next) {
 //requied content:{}
 router.put('/:name', isAuthentic,userNameVerify, function (req, res, next) {
     var name = req.params.name;
-
     if (!req.body.content) return res.send({ 'updateuserinfo': '0', 'message': 'content null' });
     var content = req.body.content;
-    if (!content.photo) content.photo = '/images/0001.jpg';
+
+    var query = {};
+    if(content.photo&&content.photo.length != 0) query['userinfo.photo'] = content.photo;
+
     collection.update({ 'name': name }, {
-        $set: {userinfo:content} } , function (err, result) {
+        $set: query } , function (err, result) {
         if (err) throw err;
 
-        if (result.length == 1) {
-            result = result[0];
-            return res.send({ 'updateuserinfo': '1', userinfo: result.userinfo });
+        if (result.n === 1) {
+
+            return res.send({ 'updateuserinfo': '1'});
         }
         else
             return res.send({ 'updateuserinfo': '0', 'message': 'db error' });

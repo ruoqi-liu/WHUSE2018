@@ -8,6 +8,7 @@
     <title>个人中心</title>
 
     <link rel="stylesheet" href="/css/card.css">
+    <link rel="stylesheet" href="/css/upload.css">
     <script type="text/javascript" src="/js/displayEffect.js"></script>
     <script type="text/javascript" src="/js/dynamicLoading.js"></script>
     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -17,6 +18,7 @@
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
+        var posts;
         var user;
         var username;
         $(document).ready(function () {
@@ -38,6 +40,28 @@
             }]
         )
 
+        $(function() {
+            $('#photoModal').on('show.bs.modal',
+                function() {
+                    document.getElementById('image').click();
+                })
+        });
+
+        $(function(){
+            var image = document.getElementById("image");
+            $(image).on("change",function () {
+                var dataURL;
+                var $file = $(this);
+                var fileObj = $file[0];
+                var windowURL = window.URL;
+                var $img = $(document.getElementById("photoImg"));
+                if (fileObj && fileObj.files && fileObj.files[0]) {
+                    dataURL = windowURL.createObjectURL(fileObj.files[0]);
+                    $img.attr('src', dataURL);
+                }
+            });
+        });
+
         let show = angular.module('show', []);
         show.controller('showCtrl', ['$scope', '$http',
             function ($scope, $http) {
@@ -53,7 +77,15 @@
                 )
             }
             $scope.showLost = function () {
-
+                $http({
+                    method : 'get',
+                    url : '/user/' + username
+                }).then(
+                    function success(res) {
+                        posts = res.data.user.posts;
+                        showUserPost(posts, 1);
+                    }
+                )
             }
             $scope.showTag = function () {
                 $http({
@@ -61,15 +93,37 @@
                     url : '/usertags/' + username
                 }).then(
                     function success(res) {
-                        alert(res.data.tags);
-                        var tags = res.data.tags;
-                        var length = tags.length;
-                        var index;
-                        for(index = 1; index < length; index++){
-                            showNewsTag('tagsPane', tags[index]);
-                        }
+                        showNewsTag(res);
                     }
                 )
+            }
+        }])
+
+        let turn = angular.module('turn', []);
+        turn.controller('turnPageCtrl', ['$scope', '$http',
+            function ($scope, $http) {
+            $scope.upPage = function () {
+                var curPage = document.getElementById("pageSearch").innerText;
+                if(curPage === "1"){
+                    alert("已经是第一页了！");
+                }
+                else{
+                    curPage--;
+                    showUserPost(posts, curPage);
+                    document.getElementById("pageSearch").innerText--;
+                }
+            }
+            $scope.downPage = function () {
+                var curPage = document.getElementById("pageSearch").innerText;
+                var length = posts.length;
+                curPage++;
+                if((curPage - 1) * 3 <= length){
+                    showUserPost(posts, curPage);
+                    document.getElementById("pageSearch").innerText++;
+                }
+                else {
+                    alert("没有更多内容了");
+                }
             }
         }])
 
@@ -85,12 +139,10 @@
                 else{
                     $http({
                         method : 'delete',
-                        url : '/user/' + username,
-                        data : {
-                            password : curPassword.value
-                        }
+                        url : '/user/' + username + '/' + curPassword.value
                     }).then(
                         function success(res) {
+                            alert(JSON.stringify(res));
                             if(res.data.isdelete === "1"){
                                 alert("用户已注销");
                                 window.location.href = '/';
@@ -105,7 +157,23 @@
             }
             
             $scope.editPhoto = function () {
+                var imagePath = document.getElementById('image').value;
+                var filePath = imagePath.split("\\");
+                var fileName = filePath[filePath.length - 1];
+                $http({
+                    method : 'put',
+                    url : '/userinfo/' + username,
+                    data : {
+                        content : {
+                            photo : '/images/' + fileName
+                        }
+                    }
+                }).then(
+                    function success() {
+                        window.location.href = '';
 
+                    }
+                )
             }
 
             $scope.editName = function () {
@@ -150,7 +218,7 @@
                         }
                     }).then(
                         function success() {
-                            alert("修改成功");
+                            alert("关注成功");
                             newTags.value = '';
                             $(document.getElementById('tagsModal')).modal('hide');
                         }
@@ -193,7 +261,7 @@
             }
         }])
 
-        angular.module('userApp', ['date', 'show', 'edit']);
+        angular.module('userApp', ['date', 'show', 'edit', 'turn']);
     </script>
 </head>
 
@@ -241,8 +309,30 @@
             <div id = 'infoPane' class = "tab-pane fade in active" style="margin-bottom: 30px">
                 <div class = 'col-md-4'>
                     <img id = 'userImage' class = 'card-img-top' width="100%" style="margin-bottom: 50px">
-                    <button class = "btn btn-primary col-md-4 col-md-offset-1" ng-click="editPhoto()">上传头像</button>
+                    <button class = "btn btn-primary col-md-4 col-md-offset-1" data-toggle = 'modal' data-target = '#photoModal'>上传头像</button>
                     <button class = "btn btn-danger col-md-offset-3" data-toggle = 'modal' data-target = '#deleteModal'>&nbsp&nbsp注销用户&nbsp</button>
+                    <div class = 'modal fade' id = 'photoModal' tabindex = '-1' role = 'dialog' aria-labelledby="photoModal" aria-hidden="true">
+                        <div class = 'modal-dialog'>
+                            <div class = 'modal-content'>
+                                <div class = 'modal-header'>
+                                    <button type="button" class = 'close' data-dismiss = 'modal' aria-hidden="true">&times</button>
+                                    <h4 class = 'modal-title' id = 'nameModalLabel'>上传头像</h4>
+                                </div>
+                                <div class = 'modal-body' style="margin-bottom: 320px">
+                                    <div class = "col-md-8 input-icon-group">
+                                        <a href="javascript:" class="a-upload">
+                                            <input id="image" type="file" name="">
+                                            <img id = "photoImg" src="" alt="上传头像" height="300" width="500">
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class = 'modal-footer'>
+                                    <button type="button" class="btn btn-default" data-dismiss = 'modal'>取消</button>
+                                    <button type="button" class="btn btn-primary" ng-click="editPhoto()">确认</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class = 'modal fade' id = 'deleteModal' tabindex = '-1' role = 'dialog' aria-labelledby="deleteModal" aria-hidden="true">
                         <div class = 'modal-dialog' style="width: 300px">
                             <div class = 'modal-content'>
@@ -335,7 +425,7 @@
                                             </div>
                                             <div class = 'modal-footer'>
                                                 <button type="button" class="btn btn-default" data-dismiss = 'modal'>取消</button>
-                                                <button type="button" class="btn btn-primary" ng-click="editTags()">修改</button>
+                                                <button type="button" class="btn btn-primary" ng-click="editTags()">添加</button>
                                             </div>
                                         </div>
                                     </div>
@@ -347,6 +437,7 @@
             </div>
 
             <div id = 'lostPane' class = "tab-pane fade">
+                &nbsp;
                 <div class="row clearfix">
                     <div class="col-md-offset-2 col-md-8">
                         <div class="content card-frame" id="lost-content-1">
@@ -377,6 +468,19 @@
             </div>
 
             <div id = 'tagsPane' class = "tab-pane fade">
+                &nbsp;
+                <div class="row clearfix">
+                    <div id = "tagsContent">
+                        <div id="tags-content-1" style="margin-bottom: 100px">
+                        </div>
+                        &nbsp;
+                        <div id="tags-content-2">
+                        </div>
+                        &nbsp;
+                        <div id="tags-content-3">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

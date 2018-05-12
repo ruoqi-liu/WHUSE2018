@@ -1,9 +1,31 @@
 //该js文件中的函数用来动态加载页面元素，包括信息卡片、标签按钮等
-function showNewsTag(id, tagName) {
-    let html;
-    html = "<button type = 'button' class = 'card-label-color-blue'>" + tagName + "</button>";
-    document.getElementById(id).innerHTML += html;
-    document.getElementById(id).style.display = "block";
+function showNewsTag(res) {
+    var index;
+    var tags = res.data.tags;
+    var length = tags.length;
+    document.getElementById('tags-content-1').innerHTML = "";
+    document.getElementById('tags-content-2').innerHTML = "";
+    document.getElementById('tags-content-3').innerHTML = "";
+    for(index = 1; index < length; index++){
+        if(index > 12){
+            document.getElementById('tags-content-3').innerHTML += "<button type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
+        }
+        else if (index > 6){
+            document.getElementById('tags-content-2').innerHTML += "<button type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
+        }
+        else if (index > 0){
+            document.getElementById('tags-content-1').innerHTML += "<button type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
+        }
+    }
+    if(length > 1){
+        document.getElementById('tags-content-1').style.display = "block";
+    }
+    if(length > 7){
+        document.getElementById('tags-content-2').style.display = "block";
+    }
+    if (length > 13){
+        document.getElementById('tags-content-3').style.display = "block";
+    }
 }
 
 function showNewsContent(id, color, image, title, time, content, newsLink){
@@ -100,6 +122,28 @@ function showLost(res) {
     }
 }
 
-function showUser(res) {
-
+function showUserPost(posts, page) {
+    var curPage = (page - 1) * 3;
+    let length = posts.length;
+    document.getElementById("lost-content-1").style.visibility = "hidden";
+    document.getElementById("lost-content-2").style.visibility = "hidden";
+    document.getElementById("lost-content-3").style.visibility = "hidden";
+    let curResult;
+    if(curPage < length) {
+        curResult = posts[curPage];
+        showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+        document.getElementById("lost-content-1").style.visibility = "visible";
+        curPage++;
+    }
+    if(curPage < length) {
+        curResult = posts[curPage];
+        showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+        document.getElementById("lost-content-2").style.visibility = "visible";
+        curPage++;
+    }
+    if(curPage < length) {
+        curResult = posts[curPage];
+        showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
+        document.getElementById("lost-content-3").style.visibility = "visible";
+    }
 }
