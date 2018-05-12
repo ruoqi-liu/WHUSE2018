@@ -126,8 +126,13 @@ router.delete('/:name', isAuthentic, function (req, res, next) {//delete
             res.send({ 'isdelete': '0', 'message': 'unknown' });
             return;
         }
-
-        res.send({ 'isdelete': '1' });
+        if (result.result.n == 1) {
+            res.send({ 'isdelete': '1' });
+            req.logout();
+            //console.log(req.user);
+        }
+        else
+            res.send({'isdelete':'0'});
         return;
     });
 });
