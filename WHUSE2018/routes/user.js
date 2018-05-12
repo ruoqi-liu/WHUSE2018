@@ -91,7 +91,11 @@ router.put('/:name', isAuthentic, function (req, res, next) {//update username o
     var updateQuery = { 'name': content.name };
     if (content.password)
         updateQuery['password'] = content.password;
-    collection.update({ name: req.params.name, password: req.body.password }, {
+    var password = req.body.password;
+    var findQuery = { name: req.params.name, 'password': password };
+    if(!password||password.length==0) 
+          delete findQuery['password'];
+    collection.update(findQuery, {
         $set: updateQuery
     }
         , function (err, result) {
