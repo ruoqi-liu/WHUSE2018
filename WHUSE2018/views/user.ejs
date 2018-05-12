@@ -7,6 +7,7 @@
 
     <title>个人中心</title>
 
+    <link rel="stylesheet" href="/css/card.css">
     <script type="text/javascript" src="/js/displayEffect.js"></script>
     <script type="text/javascript" src="/js/dynamicLoading.js"></script>
     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -21,7 +22,7 @@
         $(document).ready(function () {
             username = document.getElementById("username").innerText;
             document.getElementById("sayHello").style.visibility = "visible";
-            document.getElementById("showUser").click();
+            document.getElementById("showUserTab").click();
         })
 
         let date = angular.module('date', []);
@@ -60,7 +61,13 @@
                     url : '/usertags/' + username
                 }).then(
                     function success(res) {
-
+                        alert(res.data.tags);
+                        var tags = res.data.tags;
+                        var length = tags.length;
+                        var index;
+                        for(index = 1; index < length; index++){
+                            showNewsTag('tagsPane', tags[index]);
+                        }
                     }
                 )
             }
@@ -69,34 +76,59 @@
         let edit = angular.module('edit', []);
         edit.controller('editCtrl', ['$scope', '$http',
             function ($scope, $http) {
+            $scope.editDelete = function () {
+                var curPassword = document.getElementById('curPassword');
+                if(curPassword.value === ''){
+                    alert("请输入用户当前密码");
+                    curPassword.focus();
+                }
+                else{
+                    $http({
+                        method : 'delete',
+                        url : '/user/' + username,
+                        data : {
+                            password : curPassword.value
+                        }
+                    }).then(
+                        function success(res) {
+                            if(res.data.isdelete === "1"){
+                                alert("用户已注销");
+                                window.location.href = '/';
+                            }
+                            else{
+                                alert("注销失败");
+                                $(document.getElementById("deleteModal")).modal('hide')
+                            }
+                        }
+                    )
+                }
+            }
+            
+            $scope.editPhoto = function () {
+
+            }
+
             $scope.editName = function () {
-                var newName = document.getElementById('name');
+                var newName = document.getElementById('newName');
                 if(newName.value === ''){
                     alert('请输入新用户名');
                     newName.focus();
-                    return;
-                }
-                var curPassword = document.getElementById('curPassword');
-                if(curPassword.value === ""){
-                    alert('请输入密码');
-                    curPassword.focus();
                 }
                 else{
                     $http({
                         method : 'put',
                         url : '/user/' + username,
                         data : {
-                            password : curPassword.value,
+                            password : "",
                             content : {
                                 name : newName.value
                             }
                         }
                     }).then(
                         function success() {
-                            alert(JSON.stringify(res));
+                            alert("修改成功");
                             document.getElementById("username").innerText = newName.value;
                             newName.value = '';
-                            curPassword.value = '';
                             window.location.href='/user';
                         }
                     )
@@ -104,27 +136,23 @@
             }
 
             $scope.editTags = function () {
-                var addTag = document.getElementById('tag');
-                var curPassword = document.getElementById('curPassword');
-                if(addTag.value === ''){
-                    alert('请输入添加的标签');
-                    addTag.focus();
-                }
-                if(curPassword.value === ""){
-                    alert('请输入密码');
-                    curPassword.focus();
+                var newTags = document.getElementById('newTags');
+                if(newTags.value === ''){
+                    alert('请输入新关注的标签');
+                    newTags.focus();
                 }
                 else{
                     $http({
                         method : 'post',
                         url : '/usertags/' + username,
                         data : {
-                            newtags : [addTag.value]
+                            newtags : [newTags.value]
                         }
                     }).then(
                         function success() {
-                            addTag.value = '';
-                            curPassword.value = '';
+                            alert("修改成功");
+                            newTags.value = '';
+                            $(document.getElementById('tagsModal')).modal('hide');
                         }
                     )
                 }
@@ -132,14 +160,15 @@
 
             $scope.editPassword = function () {
                 var newPassword = document.getElementById('newPassword');
-                var curPassword = document.getElementById('curPassword');
-                if(newPassword.value === ''){
+                var curPassword = document.getElementById('oldPassword');
+                if(curPassword.value === ""){
+                    alert('请输入当前密码');
+                    curPassword.focus();
+                    return;
+                }
+                if(newPassword.value === ""){
                     alert("请输入新密码");
                     newPassword.focus();
-                }
-                if(curPassword.value === ""){
-                    alert('请输入密码');
-                    curPassword.focus();
                 }
                 else{
                     $http({
@@ -154,8 +183,10 @@
                         }
                     }).then(
                         function success() {
+                            alert("修改成功");
                             newPassword.value = '';
                             curPassword.value = '';
+                            $(document.getElementById('passwordModal')).modal('hide');
                         }
                     )
                 }
@@ -183,7 +214,7 @@
         </div>
     </div>
     <div class="row clearfix">
-        <div class="col-md-8">
+        <div class="col-md-offset-2 col-md-8">
             <div class="row clearfix" style="margin-bottom: 15px;">
                 <div class="col-md-8 column" ng-controller="dateCtrl">
                     <h4 style="display:inline-block">{{now|date:'yyyy-MM-dd HH:mm:ss'}}</h4>
@@ -193,24 +224,42 @@
         </div>
     </div>
     
-    <div>
+    <div class = "col-md-offset-2">
         <ul class = "nav nav-tabs" ng-controller="showCtrl">
             <li class = "active">
-                <a id = 'showUser' href = "#info" data-toggle = 'tab' ng-click="showUser()">个人资料</a>
+                <a id = 'showUserTab' href = "#infoPane" data-toggle = 'tab' ng-click="showUser()">个人资料</a>
             </li>
             <li>
-                <a id = 'showLost' href = "#lost" data-toggle = 'tab' ng-click="showLost()">失物信息</a>
+                <a id = 'showLostTab' href = "#lostPane" data-toggle = 'tab' ng-click="showLost()">失物信息</a>
             </li>
             <li>
-                <a id = 'showTag' href = "#tags" data-toggle = 'tab' ng-click="showTag()">关注标签</a>
+                <a id = 'showTagTab' href = "#tagsPane" data-toggle = 'tab' ng-click="showTag()">关注标签</a>
             </li>
         </ul>
 
         <div class = "tab-content" ng-controller="editCtrl">
-            <div class = "tab-pane fade in active" id = 'info' style="margin-bottom: 30px">
+            <div id = 'infoPane' class = "tab-pane fade in active" style="margin-bottom: 30px">
                 <div class = 'col-md-4'>
-                    <img id = 'userImage' class = 'card-img-top' width="100%" style="margin-bottom: 10px">
-                    <button class = "btn btn-primary col-md-4 col-md-offset-4">上传头像</button>
+                    <img id = 'userImage' class = 'card-img-top' width="100%" style="margin-bottom: 50px">
+                    <button class = "btn btn-primary col-md-4 col-md-offset-1" ng-click="editPhoto()">上传头像</button>
+                    <button class = "btn btn-danger col-md-offset-3" data-toggle = 'modal' data-target = '#deleteModal'>&nbsp&nbsp注销用户&nbsp</button>
+                    <div class = 'modal fade' id = 'deleteModal' tabindex = '-1' role = 'dialog' aria-labelledby="deleteModal" aria-hidden="true">
+                        <div class = 'modal-dialog' style="width: 300px">
+                            <div class = 'modal-content'>
+                                <div class = 'modal-header'>
+                                    <button type="button" class = 'close' data-dismiss = 'modal' aria-hidden="true">&times</button>
+                                    <h4 class = 'modal-title' id = 'nameModalLabel'>注销用户</h4>
+                                </div>
+                                <div class = 'modal-body'>
+                                    <input id = 'curPassword' type="text" class="form-control" placeholder="请输入当前密码">
+                                </div>
+                                <div class = 'modal-footer'>
+                                    <button type="button" class="btn btn-default" data-dismiss = 'modal'>取消</button>
+                                    <button type="button" class="btn btn-primary" ng-click="editDelete()">确认</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class = 'col-md-8'>
                     <form class = 'form-horizontal' role = 'form'>
@@ -220,47 +269,84 @@
                                 <input id = 'name' type = "text" class = "form-control" placeholder = <%=username%>>
                             </div>
                             <div class = 'col-md-2'>
-                                <span class = "fa fa-eraser fa-2x fa-fw" ng-click="editName()"></span>
+                                <span class = "fa fa-edit fa-2x fa-fw" data-toggle = 'modal' data-target = '#nameModal'></span>
+                                <div class = 'modal fade' id = 'nameModal' tabindex = '-1' role = 'dialog' aria-labelledby="nameModal" aria-hidden="true">
+                                    <div class = 'modal-dialog' style="width: 300px">
+                                        <div class = 'modal-content'>
+                                            <div class = 'modal-header'>
+                                                <button type="button" class = 'close' data-dismiss = 'modal' aria-hidden="true">&times</button>
+                                                <h4 class = 'modal-title' id = 'nameModalLabel'>用户名更改</h4>
+                                            </div>
+                                            <div class = 'modal-body'>
+                                                <input id = 'newName' type="text" class="form-control" placeholder="请输入新用户名">
+                                            </div>
+                                            <div class = 'modal-footer'>
+                                                <button type="button" class="btn btn-default" data-dismiss = 'modal'>取消</button>
+                                                <button type="button" class="btn btn-primary" ng-click="editName()">修改</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class = "form-group">
                             <label for = 'password' class = "col-md-2 control-label">密码</label>
                             <div class = "col-md-4">
-                                <input id = 'newPassword' type = "text" class = "form-control" placeholder = "请输入新密码">
+                                <input id = 'password' type = "text" class = "form-control" placeholder = "********">
                             </div>
                             <div class = 'col-md-2'>
-                                <span class = "fa fa-eraser fa-2x fa-fw" ng-click="editPassword()"></span>
+                                <span class = "fa fa-edit fa-2x fa-fw" data-toggle = 'modal' data-target = '#passwordModal'></span>
+                                <div class = 'modal fade' id = 'passwordModal' tabindex = '-1' role = 'dialog' aria-labelledby="passwordModal" aria-hidden="true">
+                                    <div class = 'modal-dialog' style="width: 300px">
+                                        <div class = 'modal-content'>
+                                            <div class = 'modal-header'>
+                                                <button type="button" class = 'close' data-dismiss = 'modal' aria-hidden="true">&times</button>
+                                                <h4 class = 'modal-title' id = 'nameModalLabel'>密码更改</h4>
+                                            </div>
+                                            <div class = 'modal-body'>
+                                                <input id = 'oldPassword' type="text" class="form-control" placeholder="请输入当前密码" style="margin-bottom: 20px">
+                                                <input id = 'newPassword' type="text" class="form-control" placeholder="请输入新密码">
+                                            </div>
+                                            <div class = 'modal-footer'>
+                                                <button type="button" class="btn btn-default" data-dismiss = 'modal'>取消</button>
+                                                <button type="button" class="btn btn-primary" ng-click="editPassword()">修改</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class = "form-group">
+                        <div class = "form-group" style="margin-bottom: 100px">
                             <label for = 'tags' class = "col-md-2 control-label">关注标签</label>
                             <div class = "col-md-4">
-                                <input id = 'tag' type = "text" class = "form-control" placeholder = "请添加关注的标签">
+                                <input id = 'tag' type = "text" class = "form-control" placeholder = "点击右侧按钮添加标签">
                             </div>
                             <div class = 'col-md-2'>
-                                <span class = "fa fa-eraser fa-2x fa-fw" ng-click="editTags()"></span>
+                                <span class = "fa fa-edit fa-2x fa-fw" data-toggle = 'modal' data-target = '#tagsModal'></span>
+                                <div class = 'modal fade' id = 'tagsModal' tabindex = '-1' role = 'dialog' aria-labelledby="tagsModal" aria-hidden="true">
+                                    <div class = 'modal-dialog' style="width: 300px">
+                                        <div class = 'modal-content'>
+                                            <div class = 'modal-header'>
+                                                <button type="button" class = 'close' data-dismiss = 'modal' aria-hidden="true">&times</button>
+                                                <h4 class = 'modal-title' id = 'nameModalLabel'>关注标签</h4>
+                                            </div>
+                                            <div class = 'modal-body'>
+                                                <input id = 'newTags' type="text" class="form-control" placeholder="请输入关注的新标签">
+                                            </div>
+                                            <div class = 'modal-footer'>
+                                                <button type="button" class="btn btn-default" data-dismiss = 'modal'>取消</button>
+                                                <button type="button" class="btn btn-primary" ng-click="editTags()">修改</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class = "form-group" style="margin-bottom: 50px">
-                            <label for = 'password' class = "col-md-2 control-label">确认密码</label>
-                            <div class = "col-md-4">
-                                <input id = 'curPassword' type = "text" class = "form-control" placeholder = "修改密码前请输入密码，确认身份">
-                            </div>
-                        </div>
-                        <div class = "col-md-8 col-md-offset-1">
-                            <div class = 'col-md-4'>
-                                <button class = "btn btn-primary">提交修改</button>
-                            </div>
-                            <div class = 'col-md-4'>
-                                <button class = "btn btn-danger">注销用户</button>
-                            </div>
-                        </div>
-
                     </form>
                 </div>
             </div>
 
-            <div class = "tab-pane fade" id = 'lost'>
+            <div id = 'lostPane' class = "tab-pane fade">
                 <div class="row clearfix">
                     <div class="col-md-offset-2 col-md-8">
                         <div class="content card-frame" id="lost-content-1">
@@ -290,8 +376,7 @@
                 </div>
             </div>
 
-            <div class = "tab-pane fade" id = 'tags'>
-
+            <div id = 'tagsPane' class = "tab-pane fade">
             </div>
         </div>
     </div>

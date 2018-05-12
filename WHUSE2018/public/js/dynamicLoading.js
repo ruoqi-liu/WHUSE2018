@@ -1,7 +1,7 @@
 //该js文件中的函数用来动态加载页面元素，包括信息卡片、标签按钮等
-function showNewsTag(id, tagName, tagType) {
+function showNewsTag(id, tagName) {
     let html;
-    html = "<button type = 'button' class = " + tagType + ">" + tagName + "</button>";
+    html = "<button type = 'button' class = 'card-label-color-blue'>" + tagName + "</button>";
     document.getElementById(id).innerHTML += html;
     document.getElementById(id).style.display = "block";
 }
