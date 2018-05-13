@@ -83,6 +83,9 @@
                 }).then(
                     function success(res) {
                         posts = res.data.user.posts;
+                        if(posts.length === 0){
+                            document.getElementById("lostPage").style.display = 'none';
+                        }
                         showUserPost(posts, 1);
                     }
                 )
@@ -100,8 +103,8 @@
         }])
 
         let turn = angular.module('turn', []);
-        turn.controller('turnPageCtrl', ['$scope', '$http',
-            function ($scope, $http) {
+        turn.controller('turnPageCtrl', ['$scope',
+            function ($scope) {
             $scope.upPage = function () {
                 var curPage = document.getElementById("pageSearch").innerText;
                 if(curPage === "1"){
@@ -452,7 +455,7 @@
                 </div>
                 <div class="row clearfix">
                     <div class="col-md-offset-3 col-md-9 column">
-                        <ul class="pager" ng-controller="turnPageCtrl">
+                        <ul id = 'lostPage' class="pager" ng-controller="turnPageCtrl">
                             <div class = "col-md-3">
                                 <li class="previous"><a id = "upPage" ng-click="upPage()">&larr; 上一页</a></li>
                             </div>

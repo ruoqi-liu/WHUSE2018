@@ -12,16 +12,35 @@
     <link rel="stylesheet" href="/css/upload.css">
     <script type="text/javascript" src="/js/displayEffect.js"></script>
     <script type="text/javascript" src="/js/dynamicLoading.js"></script>
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
 
     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
     <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="//webapi.amap.com/ui/1.0/main.js"></script>
+    <script src="https://webapi.amap.com/js/marker.js"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <script type="text/javascript" src="http://webapi.amap.com/demos/js/liteToolbar.js"></script>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.6&key=b67074c0028617e5ebab0fa879adfdc4"></script>
 
     <script>
+        var map;
+        var marker;
+        var position;
+        var coordinate;
+
+        var posts;
+        var curMode;
         var curType;
+
         $(document).ready(function () {
+            position = [];
+            coordinate = "";
+            clicked('listBtn', 'mapBtn');
+            curMode = "list";
+            document.getElementById('lostMap').style.display = 'none';
             document.getElementById("searchAllBtn").click();
             if(document.getElementById("userName").innerText !== "用户"){
                 document.getElementById("sayHello").style.visibility = "visible";
@@ -47,9 +66,72 @@
             });
         });
 
+        $(document).on('show.bs.modal', '.modal', function() {
+            $(this).appendTo($('body'));
+        }).on('shown.bs.modal', '.modal.in', function() {
+            setModalsAndBackdropsOrder();
+        }).on('hidden.bs.modal', '.modal', function() {
+            setModalsAndBackdropsOrder();
+        });
+
+        function setModalsAndBackdropsOrder() {
+            var modalZIndex = 1040;
+            $('.modal.in').each(function() {
+                var $modal = $(this);
+                modalZIndex++;
+                $modal.css('zIndex', modalZIndex);
+                $modal.next('.modal-backdrop.in').addClass('hidden').css('zIndex', modalZIndex - 1);
+            });
+            $('.modal.in:visible:last').focus().next('.modal-backdrop.in').removeClass('hidden');
+        }
+
+        function showPublishMap() {
+            map = new AMap.Map('publishMap',{
+                zoom : 10,
+                center : [114.355194,30.527048],
+                resizeEnable : true
+            });
+            AMap.event.addDomListener(document.getElementById('searchMap'), 'click', function() {
+                var cityName = document.getElementById('searchLocation').value;
+                if (!cityName) {
+                    cityName = '武汉市';
+                }
+                map.setCity(cityName);
+            });
+            var clickEventListener = map.on('click', function(e) {
+                document.getElementById("clickLocation").value = e.lnglat.getLng() + ',' + e.lnglat.getLat()
+            });
+            var auto = new AMap.Autocomplete({
+                input: "searchLocation"
+            });
+            AMap.event.addListener(auto, "select", select);
+            function select(e) {
+                if (e.poi && e.poi.location) {
+                    map.setZoom(15);
+                    map.setCenter(e.poi.location);
+                }
+            }
+        }
+
+        document.onkeydown = function (event) {
+            var e = event || window.event;
+            if (e && e.keyCode === 13) {
+                $("#searchMap").click();
+            }
+        };
+
         var publish = angular.module("publish", []);
         publish.controller("publishCtrl", ["$scope", "$http",
             function ($scope, $http) {
+                $scope.publishLocation = function () {
+                    coordinate = document.getElementById('clickLocation').value;
+                    if(coordinate !== ""){
+                        $(document.getElementById('mapModal')).modal('hide');
+                    }
+                    else{
+                        alert("请输入位置信息");
+                    }
+                }
                 $scope.publish = function () {
                     let s;
 
@@ -88,9 +170,22 @@
                         return false;
                     }
 
+                    s = document.getElementById("coordinate");
+                    if(coordinate === ""){
+                        alert("请确认位置信息！");
+                        s.focus();
+                        return false;
+                    }
+
                     let imagePath = document.getElementById("image").value;
                     let filePath = imagePath.split("\\");
                     let fileName = filePath[filePath.length - 1];
+
+                    var points = coordinate.split(',');
+
+                    let time = document.getElementById("time").value;
+                    time = time.split('T');
+                    time = time[0] + " " + time[1];
 
                     $http({
                         method:'post',
@@ -102,13 +197,18 @@
                                 type: document.getElementById("type").value,
                                 postinfo:
                                     {
-                                        date: document.getElementById("time").value,
-                                        image:'/images/' + fileName
+                                        date: time,
+                                        image:'/images/' + fileName,
+                                        geoJson : {
+                                            type : "Point",
+                                            coordinates : [parseFloat(points[0]), parseFloat(points[1])]
+                                         }
                                     }
                             }
                         }
                     }).then(
                         function success(res) {
+                            coordinate = "";
                             if(res.data.addpost === "1"){
                                 alert("发布成功");
                                 let lostModal = document.getElementById("lostModal");
@@ -133,10 +233,21 @@
                         }).then(
                             function success(res) {
                                 if(res.data.result.length !== 0){
-                                    showLost(res);
+                                    posts = res.data.result;
+                                    if(curMode === "list"){
+                                        showLost(res);
+                                        document.getElementById('lostList').style.display = 'block';
+                                        document.getElementById('lostPage').style.display = 'block';
+                                    }
+                                    else{
+                                        document.getElementById('clearMarker').click();
+                                        document.getElementById('showMarker').click();
+                                    }
                                 }
                                 else{
-                                    alert("没有更多内容了");
+                                    document.getElementById('lostList').style.display = 'none';
+                                    document.getElementById('lostPage').style.display = 'none';
+                                    alert("搜索结果为空");
                                 }
                             }
                         )
@@ -152,10 +263,21 @@
                         }).then(
                             function success(res) {
                                 if(res.data.result.length !== 0){
-                                    showLost(res);
+                                    posts = res.data.result;
+                                    if(curMode === "list"){
+                                        showLost(res);
+                                        document.getElementById('lostList').style.display = 'block';
+                                        document.getElementById('lostPage').style.display = 'block';
+                                    }
+                                    else{
+                                        document.getElementById('clearMarker').click();
+                                        document.getElementById('showMarker').click();
+                                    }
                                 }
                                 else{
-                                    alert("没有更多内容了");
+                                    document.getElementById('lostList').style.display = 'none';
+                                    document.getElementById('lostPage').style.display = 'none';
+                                    alert("搜索结果为空");
                                 }
                             }
                         )
@@ -169,10 +291,21 @@
                     }).then(
                         function success(res) {
                             if(res.data.result.length !== 0){
-                                showLost(res);
+                                posts = res.data.result;
+                                if(curMode === "list"){
+                                    showLost(res);
+                                    document.getElementById('lostList').style.display = 'block';
+                                    document.getElementById('lostPage').style.display = 'block';
+                                }
+                                else{
+                                    document.getElementById('clearMarker').click();
+                                    document.getElementById('showMarker').click();
+                                }
                             }
                             else{
-                                alert("没有更多内容了");
+                                document.getElementById('lostList').style.display = 'none';
+                                document.getElementById('lostPage').style.display = 'none';
+                                alert("搜索结果为空");
                             }
                         }
                     )
@@ -284,6 +417,51 @@
         }
         ])
 
+        function addMarker() {
+            var length = posts.length;
+            var index;
+            for(index = 0; index < length; index++){
+                coordinate = posts[index].postinfo.geoJson.coordinates;
+                marker = new AMap.Marker({
+                    position: [coordinate[0],coordinate[1]],
+                    map:map
+                });
+            }
+            coordinate = '';
+        }
+
+        let mode = angular.module('mode', []);
+        mode.controller('modeCtrl', ['$scope',
+            function ($scope) {
+            $scope.listMode = function () {
+                clicked('listBtn', 'mapBtn');
+                curMode = "list";
+                document.getElementById('searchAllBtn').click();
+                document.getElementById('lostMap').style.display = 'none';
+            }
+            $scope.mapMode = function () {
+                clicked('mapBtn', 'listBtn');
+                curMode = "map";
+                document.getElementById('lostList').style.display = 'none';
+                document.getElementById('lostMap').style.display = 'block';
+                document.getElementById('lostPage').style.display = 'none';
+                map = new AMap.Map('lostMap', {
+                    zoom : 10,
+                    center : [114.355194,30.527048],
+                    resizeEnable: true
+                });
+                AMap.event.addDomListener(document.getElementById('showMarker'), 'click', function() {
+                    addMarker();
+                }, false);
+                AMap.event.addDomListener(document.getElementById('clearMarker'), 'click', function() {
+                    if (marker) {
+                        marker.setMap(null);
+                        marker = null;
+                    }
+                }, false);
+            }
+        }])
+
         let date = angular.module('date', []);
         date.controller('dateCtrl', ['$scope', '$timeout', '$interval',
             function($scope, $timeout, $interval){
@@ -296,7 +474,7 @@
                 }
             }])
 
-        angular.module('lostApp', ['publish', 'search', 'quit', 'turn', 'date']);
+        angular.module('lostApp', ['publish', 'search', 'quit', 'turn', 'date', 'mode']);
     </script>
 </head>
 
@@ -313,75 +491,110 @@
                     </ul>
                 </div>
                 <div class="col-md-8">
-                    <div class = "col-md-5">
+                    <div class = "col-md-5" ng-controller="modeCtrl">
                         <button id = "publishBtn" type = "button" class = "btn btn-default navbar-btn navbar-middle" data-toggle = modal data-target = #lostModal>
                             <span class = "fa fa-edit">&nbsp发布</span>
                         </button>&nbsp&nbsp&nbsp
-                        <button id = "listBtn" type = "button" class = "btn btn-default navbar-btn navbar-middle" onclick = "clicked('list', 'map')">
+                        <button id = "listBtn" type = "button" class = "btn btn-default navbar-btn navbar-middle" ng-click="listMode()">
                             <span class = "fa fa-list-ul">&nbsp列表</span>
                         </button>&nbsp&nbsp&nbsp
-                        <button id = "mapBtn" type = "button" class = "btn btn-default navbar-btn navbar-middle" onclick = "clicked('map', 'list')">
+                        <button id = "mapBtn" type = "button" class = "btn btn-default navbar-btn navbar-middle" ng-click="mapMode()">
                             <span class = "fa fa-map-o">&nbsp地图</span>
                         </button>
                     </div>
 
-                    <div id = "lostModal" class = "modal fade" tabindex = "-1" role = "dialog" aria-labelledby = "lostModalLabel" aria-hidden = "true">
-                        <div class = "modal-dialog">
-                            <div class = "modal-content" ng-controller="publishCtrl">
-                                <div class = "modal-header">
-                                    <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
-                                    <h4 class = "modal-title">发布失物招领信息</h4>
+                    <div ng-controller="publishCtrl">
+                        <div id = "lostModal" class = "modal fade" tabindex = "-1" role = "dialog" aria-labelledby = "lostModalLabel" aria-hidden = "true">
+                            <div class = "modal-dialog">
+                                <div class = "modal-content">
+                                    <div class = "modal-header">
+                                        <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
+                                        <h4 class = "modal-title">发布失物招领信息</h4>
+                                    </div>
+
+                                    <div class = "modal-body">
+                                        <form id = "inputList" class="form-horizontal" role = "form">
+                                            <div class = "form-group">
+                                                <label for = "type" class = "col-md-3 control-label fa fa-sort-amount-asc">&nbsp&nbsp信息类别</label>
+                                                <div class = "col-md-8">
+                                                    <select id = "type" class = "form-control">
+                                                        <option value = "">请选择</option>
+                                                        <option value = "lost">寻找失物</option>
+                                                        <option value = "found">寻找失主</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class = "form-group">
+                                                <label for = "title" class = "col-md-3 control-label fa fa-navicon">&nbsp&nbsp信息标题</label>
+                                                <div class = "col-md-8">
+                                                    <input id = "title" type = "text" class = "form-control" placeholder="请输入信息标题">
+                                                </div>
+                                            </div>
+
+                                            <div class = "form-group">
+                                                <label for = "time" class = "col-md-3 control-label fa fa-at">&nbsp&nbsp丢失时间</label>
+                                                <div class = "col-md-8">
+                                                    <input id = "time" type = "datetime-local" class = "form-control" placeholder = "请输入时间">
+                                                </div>
+                                            </div>
+
+                                            <div class = "form-group">
+                                                <label for = "content" class = "col-md-3 control-label fa fa-expand">&nbsp&nbsp详细信息</label>
+                                                <div class = "col-md-8">
+                                                    <textarea id = "content" class = "form-control" placeholder = "请输入物品简介"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class = "form-group">
+                                                <lable for = "image" class = "col-md-3 control-label fa fa-image">&nbsp&nbsp上传图片</lable>
+                                                <div class = "col-md-8 input-icon-group">
+                                                    <a href="javascript:" class="a-upload">
+                                                        <input  id="image" type="file" name="">
+                                                        <img id = "lostImg" src="" alt="在此处选择图片" height="200" width="200">
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class = "form-group">
+                                                <label for = "coordinate" class = "col-md-3 control-label fa fa-map">&nbsp&nbsp位置信息</label>
+                                                <div class = "col-md-8">
+                                                    <button id ="coordinate" type = "button" class = "btn btn-default" data-toggle = 'modal' data-target = '#mapModal' onclick="showPublishMap()">上传位置信息</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class = "modal-footer">
+                                        <button type = "button" class = "btn btn-default" data-dismiss = "modal">取消</button>
+                                        <button type = "button" class = "btn btn-primary" ng-click= "publish()">发布</button>
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <div class = "modal-body">
-                                    <form id = "inputList" class="form-horizontal" role = "form">
-                                        <div class = "form-group">
-                                            <label for = "type" class = "col-md-3 control-label fa fa-sort-amount-asc">&nbsp&nbsp信息类别</label>
-                                            <div class = "col-md-8">
-                                                <select id = "type" class = "form-control">
-                                                    <option value = "">请选择</option>
-                                                    <option value = "lost">寻找失物</option>
-                                                    <option value = "found">寻找失主</option>
-                                                </select>
-                                            </div>
+                        <div class = 'modal fade' id = 'mapModal' tabindex = '-1' role = 'dialog' aria-labelledby="mapModal" aria-hidden="true">
+                            <div class = 'modal-dialog' style="height:500px; width: 1000px;">
+                                <div class = 'modal-content'>
+                                    <div class = 'modal-header'>
+                                        <button type="button" class = 'close' data-dismiss = 'modal' aria-hidden="true">&times</button>
+                                        <h4 class = 'modal-title' id = 'mapModalLabel'>上传位置信息</h4>
+                                    </div>
+                                    <div class = 'modal-body col-md-offset-1'>
+                                        <div class = "form-group col-md-5">
+                                            <label class = "control-label">按关键字搜索：</label>
+                                            <input type="text" placeholder="请输入城市名并按回车确认" id="searchLocation" class = "form-control">
+                                            <button id = "searchMap" class = "btn btn-primary" value = "确定" style="display: none;"></button>
                                         </div>
-
-                                        <div class = "form-group">
-                                            <label for = "title" class = "col-md-3 control-label fa fa-navicon">&nbsp&nbsp信息标题</label>
-                                            <div class = "col-md-8">
-                                                <input id = "title" type = "text" class = "form-control" placeholder="请输入信息标题">
-                                            </div>
+                                        <div class = "form-group col-md-offset-1 col-md-5">
+                                            <label class = "control-label">左击获取经纬度：</label>
+                                            <input type="text" readonly = 'true' id="clickLocation" title="" class = "form-control">
                                         </div>
-
-                                        <div class = "form-group">
-                                            <label for = "time" class = "col-md-3 control-label fa fa-at">&nbsp&nbsp丢失时间</label>
-                                            <div class = "col-md-8">
-                                                <input id = "time" type = "datetime-local" class = "form-control" placeholder = "请输入时间">
-                                            </div>
+                                        <div id = 'publishMap' style="height: 500px;width:800px;">
                                         </div>
-
-                                        <div class = "form-group">
-                                            <label for = "content" class = "col-md-3 control-label fa fa-expand">&nbsp&nbsp详细信息</label>
-                                            <div class = "col-md-8">
-                                                <textarea id = "content" class = "form-control" placeholder = "请输入物品简介"></textarea>
-                                            </div>
-                                        </div>
-
-                                        <div class = "form-group">
-                                            <lable for = "image" class = "col-md-3 control-label fa fa-image">&nbsp&nbsp上传图片</lable>
-                                            <div class = "col-md-8 input-icon-group">
-                                                <a href="javascript:" class="a-upload">
-                                                    <input  id="image" type="file" name="">
-                                                    <img id = "lostImg" src="" alt="在此处选择图片" height="200" width="200">
-                                                </a>
-                                            </div>
-                                        </div>
-
-                                    </form>
-                                </div>
-                                <div class = "modal-footer">
-                                    <button type = "button" class = "btn btn-default" data-dismiss = "modal">取消</button>
-                                    <button type = "button" class = "btn btn-primary" ng-click= "publish()">发布</button>
+                                    </div>
+                                    <div class = 'modal-footer'>
+                                        <button type="button" class="btn btn-default" data-dismiss = 'modal'>取消</button>
+                                        <button type="button" class="btn btn-primary" ng-click="publishLocation()">确认</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -420,22 +633,29 @@
                             <button id = "searchAllBtn" style="display:none;" ng-click="searchAll()"></button>
                         </div>
                     </div>
+                    <button id = "showMarker" style="display: none"></button>
+                    <button id = "clearMarker" style="display: none;"></button>
                 </div>
             </div>
 
-            <div class="content card-frame" id="lost-content-1">
+            <div id = 'lostList' style="display: none;">
+                <div class="content card-frame" id="lost-content-1">
+                </div>
+                &nbsp;
+                <div class="content card-frame" id="lost-content-2">
+                </div>
+                &nbsp;
+                <div class="content card-frame" id="lost-content-3">
+                </div>
             </div>
-            &nbsp;
-            <div class="content card-frame" id="lost-content-2">
-            </div>
-            &nbsp;
-            <div class="content card-frame" id="lost-content-3">
+            <div id = 'lostMap' style="height: 500px;width:800px;">
+
             </div>
         </div>
     </div>
     <div class="row clearfix">
         <div class="col-md-offset-3 col-md-9 column">
-            <ul class="pager" ng-controller="turnPageCtrl">
+            <ul id = 'lostPage' class="pager" ng-controller="turnPageCtrl" style="display: none">
                 <div class = "col-md-3">
                 <li class="previous"><a id = "upPage" ng-click="upPage()">&larr; 上一页</a></li>
                 </div>
