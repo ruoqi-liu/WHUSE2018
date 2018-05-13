@@ -87,7 +87,7 @@
 
         function showPublishMap() {
             map = new AMap.Map('publishMap',{
-                zoom : 10,
+                zoom : 100,
                 center : [114.355194,30.527048],
                 resizeEnable : true
             });
@@ -225,6 +225,10 @@
         search.controller("searchCtrl", ["$scope", "$http",
             function ($scope, $http) {
                 $scope.search = function () {
+                    if(curMode === 'map'){
+                        document.getElementById('searchGeo').click();
+                        return;
+                    }
                     if(document.getElementById("titleSearch").value === ""){
                         curType = "all";
                         $http({
@@ -234,15 +238,9 @@
                             function success(res) {
                                 if(res.data.result.length !== 0){
                                     posts = res.data.result;
-                                    if(curMode === "list"){
-                                        showLost(res);
-                                        document.getElementById('lostList').style.display = 'block';
-                                        document.getElementById('lostPage').style.display = 'block';
-                                    }
-                                    else{
-                                        document.getElementById('clearMarker').click();
-                                        document.getElementById('showMarker').click();
-                                    }
+                                    showLost(res);
+                                    document.getElementById('lostList').style.display = 'block';
+                                    document.getElementById('lostPage').style.display = 'block';
                                 }
                                 else{
                                     document.getElementById('lostList').style.display = 'none';
@@ -264,15 +262,9 @@
                             function success(res) {
                                 if(res.data.result.length !== 0){
                                     posts = res.data.result;
-                                    if(curMode === "list"){
-                                        showLost(res);
-                                        document.getElementById('lostList').style.display = 'block';
-                                        document.getElementById('lostPage').style.display = 'block';
-                                    }
-                                    else{
-                                        document.getElementById('clearMarker').click();
-                                        document.getElementById('showMarker').click();
-                                    }
+                                    showLost(res);
+                                    document.getElementById('lostList').style.display = 'block';
+                                    document.getElementById('lostPage').style.display = 'block';
                                 }
                                 else{
                                     document.getElementById('lostList').style.display = 'none';
@@ -284,6 +276,10 @@
                     }
                 }
                 $scope.searchAll = function () {
+                    if(curMode === 'map'){
+                        document.getElementById('searchGeo').click();
+                        return;
+                    }
                     curType = "all";
                     $http({
                         method:'get',
@@ -292,20 +288,32 @@
                         function success(res) {
                             if(res.data.result.length !== 0){
                                 posts = res.data.result;
-                                if(curMode === "list"){
-                                    showLost(res);
-                                    document.getElementById('lostList').style.display = 'block';
-                                    document.getElementById('lostPage').style.display = 'block';
-                                }
-                                else{
-                                    document.getElementById('clearMarker').click();
-                                    document.getElementById('showMarker').click();
-                                }
+                                showLost(res);
+                                document.getElementById('lostList').style.display = 'block';
+                                document.getElementById('lostPage').style.display = 'block';
                             }
                             else{
                                 document.getElementById('lostList').style.display = 'none';
                                 document.getElementById('lostPage').style.display = 'none';
                                 alert("搜索结果为空");
+                            }
+                        }
+                    )
+                }
+                $scope.searchGeo = function () {
+                    $http({
+                        method: 'post',
+                        url: '/posts/search/' + document.getElementById("typeSearch").value + '/1',
+                        data: {
+                            text: document.getElementById("titleSearch").value,
+                            geoJson : document.getElementById("titleSearch").value
+                        }
+                    }).then(
+                        function success(res) {
+                            if(res.data.result.length !== 0) {
+                                posts = res.data.result;
+                                document.getElementById('clearMarker').click();
+                                document.getElementById('showMarker').click();
                             }
                         }
                     )
@@ -446,9 +454,13 @@
                 document.getElementById('lostMap').style.display = 'block';
                 document.getElementById('lostPage').style.display = 'none';
                 map = new AMap.Map('lostMap', {
-                    zoom : 10,
+                    zoom : 100,
                     center : [114.355194,30.527048],
                     resizeEnable: true
+                });
+                var clickEventListener = map.on('click', function(e) {
+                    document.getElementById("titleSearch").value = e.lnglat.getLng() + ',' + e.lnglat.getLat()
+                    document.getElementById('searchGeo').click();
                 });
                 AMap.event.addDomListener(document.getElementById('showMarker'), 'click', function() {
                     addMarker();
@@ -478,7 +490,7 @@
     </script>
 </head>
 
-<body ng-app ="lostApp">
+<body ng-app ="lostApp" style="background-image: url(/images/background-2.jpg);">
 <div class="container">
     <div class="row clearfix">
         <div class="col-md-12 column">
@@ -631,6 +643,7 @@
                             <input id = "titleSearch" type = "text" class = "form-control" title="搜索" value="">
                             <span class = "input-group-btn"><button id = "searchBtn" class = "btn btn-default" type = "button" ng-click="search()">搜索</button></span>
                             <button id = "searchAllBtn" style="display:none;" ng-click="searchAll()"></button>
+                            <button id = 'searchGeo' style="display: none" ng-click="searchGeo()"></button>
                         </div>
                     </div>
                     <button id = "showMarker" style="display: none"></button>

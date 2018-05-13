@@ -1,20 +1,27 @@
 //该js文件中的函数用来动态加载页面元素，包括信息卡片、标签按钮等
 function showNewsTag(res) {
-    var index;
-    var tags = res.data.tags;
-    var length = tags.length;
     document.getElementById('tags-content-1').innerHTML = "";
     document.getElementById('tags-content-2').innerHTML = "";
     document.getElementById('tags-content-3').innerHTML = "";
+
+    var name;
+    var tags = res.data.tags;
+    var length = tags.length;
+    if(length === 0){
+        return;
+    }
+
+    var index;
     for(index = 1; index < length; index++){
+        name = 'tag' + index;
         if(index > 12){
-            document.getElementById('tags-content-3').innerHTML += "<button type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
+            document.getElementById('tags-content-3').innerHTML += "<button id = " + name + " onclick='deleteTags(this)' type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
         }
         else if (index > 6){
-            document.getElementById('tags-content-2').innerHTML += "<button type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
+            document.getElementById('tags-content-2').innerHTML += "<button id = " + name + " onclick='deleteTags(this)' type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
         }
         else if (index > 0){
-            document.getElementById('tags-content-1').innerHTML += "<button type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
+            document.getElementById('tags-content-1').innerHTML += "<button id = " + name + " onclick='deleteTags(this)' type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
         }
     }
     if(length > 1){
@@ -52,11 +59,19 @@ function showNewsContent(id, color, image, title, time, content, newsLink){
 }
 
 function showNews(res){
-    let resultArray = res.data.news;
-    let length = resultArray.length;
+    document.getElementById("newsPage").style.display = 'none';
     document.getElementById("news-content-1").style.visibility = "hidden";
     document.getElementById("news-content-2").style.visibility = "hidden";
     document.getElementById("news-content-3").style.visibility = "hidden";
+
+    let resultArray = res.data.news;
+    let length = resultArray.length;
+
+    if(length === 0){
+        alert("无搜索结果");
+        return;
+    }
+
     let curResult;
     if (length !== 0) {
         curResult = resultArray[0];
@@ -75,6 +90,7 @@ function showNews(res){
         showNewsContent("news-content-3", "card-label-color-blue", "/images/0001.jpg", "", curResult.date, curResult.title, curResult.href);
         document.getElementById("news-content-3").style.visibility = "visible";
     }
+    document.getElementById("newsPage").style.display = 'block';
 }
 
 //根据传入的参数，构造失物招领信息卡片
@@ -123,27 +139,39 @@ function showLost(res) {
 }
 
 function showUserPost(posts, page) {
-    var curPage = (page - 1) * 3;
-    let length = posts.length;
+    document.getElementById("lostPage").style.display = 'none';
     document.getElementById("lost-content-1").style.visibility = "hidden";
     document.getElementById("lost-content-2").style.visibility = "hidden";
     document.getElementById("lost-content-3").style.visibility = "hidden";
+
+    let length = posts.length;
+    if(length === 0){
+        return;
+    }
+    var curPage = (page - 1) * 3;
+
     let curResult;
     if(curPage < length) {
         curResult = posts[curPage];
         showLostContent("lost-content-1", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
         document.getElementById("lost-content-1").style.visibility = "visible";
         curPage++;
+        document.getElementById('userlost-id-1').innerHTML = curResult._id;
     }
     if(curPage < length) {
         curResult = posts[curPage];
+        document.getElementById('userlost-id-2').innerHTML = curResult._id;
         showLostContent("lost-content-2", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
         document.getElementById("lost-content-2").style.visibility = "visible";
         curPage++;
+        document.getElementById('userlost-id-2').innerHTML = curResult._id;
     }
     if(curPage < length) {
         curResult = posts[curPage];
+        document.getElementById('userlost-id-3').innerHTML = curResult._id;
         showLostContent("lost-content-3", "card-label-color-blue", curResult.postinfo.image, curResult.title, curResult.postinfo.date, curResult.content);
         document.getElementById("lost-content-3").style.visibility = "visible";
+        document.getElementById('userlost-id-3').innerHTML = curResult._id;
     }
+    document.getElementById("lostPage").style.display = 'block';
 }

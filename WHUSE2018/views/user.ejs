@@ -18,12 +18,12 @@
     <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <script>
-        var posts;
         var user;
+        var posts;
         var username;
+
         $(document).ready(function () {
             username = document.getElementById("username").innerText;
-            document.getElementById("sayHello").style.visibility = "visible";
             document.getElementById("showUserTab").click();
         })
 
@@ -40,13 +40,6 @@
             }]
         )
 
-        $(function() {
-            $('#photoModal').on('show.bs.modal',
-                function() {
-                    document.getElementById('image').click();
-                })
-        });
-
         $(function(){
             var image = document.getElementById("image");
             $(image).on("change",function () {
@@ -61,6 +54,20 @@
                 }
             });
         });
+
+        $(function() {
+            $('#photoModal').on('show.bs.modal',
+                function() {
+                    document.getElementById('image').click();
+                }
+            )
+        });
+        
+        function deleteTags(obj) {
+            var id = event.target.id;
+            id = document.getElementById(id);
+            $(id).remove();
+        }
 
         let show = angular.module('show', []);
         show.controller('showCtrl', ['$scope', '$http',
@@ -83,9 +90,6 @@
                 }).then(
                     function success(res) {
                         posts = res.data.user.posts;
-                        if(posts.length === 0){
-                            document.getElementById("lostPage").style.display = 'none';
-                        }
                         showUserPost(posts, 1);
                     }
                 )
@@ -108,7 +112,7 @@
             $scope.upPage = function () {
                 var curPage = document.getElementById("pageSearch").innerText;
                 if(curPage === "1"){
-                    alert("已经是第一页了！");
+                    alert("没有上一页了！");
                 }
                 else{
                     curPage--;
@@ -120,13 +124,48 @@
                 var curPage = document.getElementById("pageSearch").innerText;
                 var length = posts.length;
                 curPage++;
-                if((curPage - 1) * 3 <= length){
+                if((curPage - 1) * 3 < length){
                     showUserPost(posts, curPage);
                     document.getElementById("pageSearch").innerText++;
                 }
                 else {
-                    alert("没有更多内容了");
+                    alert("没有下一页了！");
                 }
+            }
+        }])
+
+        let deletePost = angular.module('deletePost', []);
+        deletePost.controller('deletePostCtrl', ['$scope', '$http',
+            function ($scope, $http) {
+            $scope.deletePost1 = function () {
+                $http({
+                    method : 'delete',
+                    url : '/posts/' + document.getElementById('userlost-id-1').innerHTML
+                }).then(
+                    function success() {
+                        window.location.href = '';
+                    }
+                )
+            }
+            $scope.deletePost2 = function () {
+                $http({
+                    method : 'delete',
+                    url : '/posts/' + document.getElementById('userlost-id-2').innerHTML
+                }).then(
+                    function success() {
+                        window.location.href = '';
+                    }
+                )
+            }
+            $scope.deletePost3 = function () {
+                $http({
+                    method : 'delete',
+                    url : '/posts/' + document.getElementById('userlost-id-3').innerHTML
+                }).then(
+                    function success() {
+                        window.location.href = '';
+                    }
+                )
             }
         }])
 
@@ -145,7 +184,6 @@
                         url : '/user/' + username + '/' + curPassword.value
                     }).then(
                         function success(res) {
-                            alert(JSON.stringify(res));
                             if(res.data.isdelete === "1"){
                                 alert("用户已注销");
                                 window.location.href = '/';
@@ -161,6 +199,10 @@
             
             $scope.editPhoto = function () {
                 var imagePath = document.getElementById('image').value;
+                if(imagePath === ""){
+                    alert("请选择新头像");
+                    return;
+                }
                 var filePath = imagePath.split("\\");
                 var fileName = filePath[filePath.length - 1];
                 $http({
@@ -174,7 +216,6 @@
                 }).then(
                     function success() {
                         window.location.href = '';
-
                     }
                 )
             }
@@ -196,11 +237,16 @@
                             }
                         }
                     }).then(
-                        function success() {
-                            alert("修改成功");
-                            document.getElementById("username").innerText = newName.value;
-                            newName.value = '';
-                            window.location.href='/user';
+                        function success(res) {
+                            if(res.data.isupdate === '1'){
+                                alert("修改成功");
+                                document.getElementById("username").innerText = newName.value;
+                                newName.value = '';
+                                window.location.href='/user';
+                            }
+                            else{
+                                alert("修改失败");
+                            }
                         }
                     )
                 }
@@ -264,11 +310,11 @@
             }
         }])
 
-        angular.module('userApp', ['date', 'show', 'edit', 'turn']);
+        angular.module('userApp', ['date', 'show', 'edit', 'turn', 'deletePost']);
     </script>
 </head>
 
-<body ng-app="userApp">
+<body ng-app="userApp" style="background-image: url(/images/background-2.jpg);">
 <p id = "username" style="display: none"><%= username%></p>
 <div class="container">
     <div class="row clearfix">
@@ -442,15 +488,69 @@
             <div id = 'lostPane' class = "tab-pane fade">
                 &nbsp;
                 <div class="row clearfix">
-                    <div class="col-md-offset-2 col-md-8">
-                        <div class="content card-frame" id="lost-content-1">
+                    <div class="col-md-offset-1 col-md-9" ng-controller="deletePostCtrl">
+                        <div class="content card-frame" id="lost-content-1" data-toggle = "modal" data-target = "#lost1Modal">
                         </div>
+                        <div class = "modal fade" id = "lost1Modal" tabindex = '-1' role = 'dialog' aria-labelledby="tagsModal" aria-hidden="true">
+                            <div class = 'modal-dialog' style="width: 300px">
+                                <div class = 'modal-content'>
+                                    <div class = 'modal-header'>
+                                        <button type="button" class = 'close' data-dismiss = 'modal' aria-hidden="true">&times</button>
+                                        <h4 class = 'modal-title' id = 'lost1ModalLabel'>删除记录</h4>
+                                    </div>
+                                    <div class = 'modal-body'>
+                                        <h4>是否删除该条记录？</h4>
+                                    </div>
+                                    <div class = 'modal-footer'>
+                                        <button type="button" class="btn btn-primary" data-dismiss = 'modal'>取消</button>
+                                        <button type="button" class="btn btn-danger" ng-click="deletePost1()">删除</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p id = 'userlost-id-1' style="display: none"></p>
                         &nbsp;
-                        <div class="content card-frame" id="lost-content-2">
+                        <div class="content card-frame" id="lost-content-2" data-toggle = "modal" data-target = "#lost2Modal">
                         </div>
+                        <div class = "modal fade" id = "lost2Modal" tabindex = '-1' role = 'dialog' aria-labelledby="tagsModal" aria-hidden="true">
+                            <div class = 'modal-dialog' style="width: 300px">
+                                <div class = 'modal-content'>
+                                    <div class = 'modal-header'>
+                                        <button type="button" class = 'close' data-dismiss = 'modal' aria-hidden="true">&times</button>
+                                        <h4 class = 'modal-title' id = 'lost1ModalLabel'>删除记录</h4>
+                                    </div>
+                                    <div class = 'modal-body'>
+                                        <h4>是否删除该条记录？</h4>
+                                    </div>
+                                    <div class = 'modal-footer'>
+                                        <button type="button" class="btn btn-primary" data-dismiss = 'modal'>取消</button>
+                                        <button type="button" class="btn btn-danger" ng-click="deletePost2()">删除</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p id = 'userlost-id-2' style="display: none"></p>
                         &nbsp;
-                        <div class="content card-frame" id="lost-content-3">
+                        <div class="content card-frame" id="lost-content-3" data-toggle = "modal" data-target = "#lost3Modal">
                         </div>
+                        <div class = "modal fade" id = "lost1Moda3" tabindex = '-1' role = 'dialog' aria-labelledby="tagsModal" aria-hidden="true">
+                            <div class = 'modal-dialog' style="width: 300px">
+                                <div class = 'modal-content'>
+                                    <div class = 'modal-header'>
+                                        <button type="button" class = 'close' data-dismiss = 'modal' aria-hidden="true">&times</button>
+                                        <h4 class = 'modal-title' id = 'lost1ModalLabel'>删除记录</h4>
+                                    </div>
+                                    <div class = 'modal-body'>
+                                        <h4>是否删除该条记录？</h4>
+                                    </div>
+                                    <div class = 'modal-footer'>
+                                        <button type="button" class="btn btn-primary" data-dismiss = 'modal'>取消</button>
+                                        <button type="button" class="btn btn-danger" ng-click="deletePost3()">删除</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p id = 'userlost-id-3' style="display: none"></p>
                     </div>
                 </div>
                 <div class="row clearfix">
