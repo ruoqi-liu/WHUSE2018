@@ -15,13 +15,13 @@ function showNewsTag(res) {
     for(index = 1; index < length; index++){
         name = 'tag' + index;
         if(index > 12){
-            document.getElementById('tags-content-3').innerHTML += "<button id = " + name + " onclick='deleteTags(this)' type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
+            document.getElementById('tags-content-3').innerHTML += "<button id = " + name + " ng-click='deleteTag()' type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
         }
         else if (index > 6){
-            document.getElementById('tags-content-2').innerHTML += "<button id = " + name + " onclick='deleteTags(this)' type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
+            document.getElementById('tags-content-2').innerHTML += "<button id = " + name + " ng-click='deleteTag()' type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
         }
         else if (index > 0){
-            document.getElementById('tags-content-1').innerHTML += "<button id = " + name + " onclick='deleteTags(this)' type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
+            document.getElementById('tags-content-1').innerHTML += "<button id = " + name + " ng-click='deleteTag()' type = 'button' class = 'btn btn-primary' style='margin-right: 20px'>" + tags[index] + "</button>";
         }
     }
     if(length > 1){

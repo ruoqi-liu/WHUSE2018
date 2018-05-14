@@ -15,7 +15,7 @@ var newsCollection = db.get('news');
 
 //required body.searchtext body.faculty:[]
 router.post('/search/:page', function (req, res, next) {
-    var eachPageNum = 10;
+    var eachPageNum = 3;
     var page = req.params.page;
     var limitNum = page*eachPageNum;
     var skipNum = (page - 1) * eachPageNum;
@@ -25,6 +25,7 @@ router.post('/search/:page', function (req, res, next) {
     var query = { 'faculty': { '$in': faculty }, 'tags': { '$in': textParts } };
     if(!faculty||faculty.length == 0) delete query['faculty'];
     newsCollection.find(query, { fields: { tags: 0 }, sort: { date: -1 }, limit: limitNum ,skip:skipNum}).then(results => {
+        console.log(results);
         res.send({ 'searchnews': '1', 'news': results });
         return;
     }).catch(err => {
@@ -34,7 +35,7 @@ router.post('/search/:page', function (req, res, next) {
 });
 
 router.post('/:name/:page', isAuthentic, userNameVerify, function (req, res, next) {
-    var eachPageNum = 10;
+    var eachPageNum = 3;
     var page = req.params.page;
     var limitNum = page*eachPageNum;
     var skipNum = (page - 1) * eachPageNum;
@@ -48,7 +49,7 @@ router.post('/:name/:page', isAuthentic, userNameVerify, function (req, res, nex
         if (!tags || tags.length == 1) delete query['tags'];
         return newsCollection.find(query, { fields: { tags: 0 }, sort: { date: -1 }, limit: limitNum ,skip:skipNum});
     }).then(results => {
-        res.send({ 'getNews': '1', 'news': results });
+    res.send({ 'getNews': '1', 'news': results });
         return;
     }).catch(err => {
         res.send({ 'getNews': '0', message: 'db error' });
@@ -57,7 +58,7 @@ router.post('/:name/:page', isAuthentic, userNameVerify, function (req, res, nex
 });
 
 router.get('/:page',function (req,res,next) {
-    var eachPageNum = 10;
+    var eachPageNum = 3;
     var page = req.params.page;
     var limitNum = page*eachPageNum;
     var skipNum = (page - 1) * eachPageNum;

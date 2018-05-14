@@ -67,6 +67,7 @@
         search.controller('searchCtrl', ['$scope', '$http',
             function ($scope, $http) {
             $scope.searchAll = function () {
+                document.getElementById("pageSearch").innerText = "1";
                 curType = "all";
                 $http({
                     method :'get',
@@ -78,6 +79,7 @@
                 )
             }
             $scope.searchUser = function () {
+                document.getElementById("pageSearch").innerText = "1";
                 curType = "user";
                 $http({
                     method : 'post',
@@ -89,6 +91,7 @@
                 )
             }
             $scope.search = function () {
+                document.getElementById("pageSearch").innerText = "1";
                 if(document.getElementById("titleSearch").value === ""){
                     curType = "all";
                     $http({

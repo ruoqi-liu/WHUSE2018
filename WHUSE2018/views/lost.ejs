@@ -48,6 +48,7 @@
             }
             else{
                 document.getElementById("sayHello").style.visibility = "hidden";
+                loginBtn("show");
             }
         })
 
@@ -107,7 +108,7 @@
             AMap.event.addListener(auto, "select", select);
             function select(e) {
                 if (e.poi && e.poi.location) {
-                    map.setZoom(15);
+                    map.setZoom(100);
                     map.setCenter(e.poi.location);
                 }
             }
@@ -119,6 +120,26 @@
                 $("#searchMap").click();
             }
         };
+
+        function isGeo(text) {
+            var curText = text.split(',');
+            if(curText !== text){
+                return false;
+            }
+            else{
+                if(curText.length !== 2){
+                    return false;
+                }
+                else{
+                    if(isNaN(parseFloat(curText[0]))){
+                        return false;
+                    }
+                    else{
+                        return !isNaN(parseFloat(curText[1]));
+                    }
+                }
+            }
+        }
 
         var publish = angular.module("publish", []);
         publish.controller("publishCtrl", ["$scope", "$http",
@@ -217,7 +238,8 @@
                             else {
                                 alert("发布失败");
                             }
-                        })
+                        }
+                    )
                 }
         }])
 
@@ -225,8 +247,49 @@
         search.controller("searchCtrl", ["$scope", "$http",
             function ($scope, $http) {
                 $scope.search = function () {
+                    document.getElementById("pageSearch").innerText = "1";
                     if(curMode === 'map'){
-                        document.getElementById('searchGeo').click();
+                        var geoText = document.getElementById("titleSearch").value;
+                        if(isGeo(geoText)){
+                            $http({
+                                method: 'post',
+                                url: '/posts/search/' + document.getElementById("typeSearch").value + '/1',
+                                data: {
+                                    geoJson : document.getElementById("titleSearch").value
+                                }
+                            }).then(
+                                function success(res) {
+                                    if(res.data.result.length !== 0) {
+                                        posts = res.data.result;
+                                        document.getElementById('clearMarker').click();
+                                        document.getElementById('showMarker').click();
+                                    }
+                                    else{
+                                        alert("搜索结果为空");
+                                    }
+                                }
+                            )
+                        }
+                        else{
+                            $http({
+                                method: 'post',
+                                url: '/posts/search/' + document.getElementById("typeSearch").value + '/0',
+                                data: {
+                                    text: document.getElementById("titleSearch").value
+                                }
+                            }).then(
+                                function success(res) {
+                                    if(res.data.result.length !== 0) {
+                                        posts = res.data.result;
+                                        document.getElementById('clearMarker').click();
+                                        document.getElementById('showMarker').click();
+                                    }
+                                    else{
+                                        alert("搜索结果为空");
+                                    }
+                                }
+                            )
+                        }
                         return;
                     }
                     if(document.getElementById("titleSearch").value === ""){
@@ -276,10 +339,7 @@
                     }
                 }
                 $scope.searchAll = function () {
-                    if(curMode === 'map'){
-                        document.getElementById('searchGeo').click();
-                        return;
-                    }
+                    document.getElementById("pageSearch").innerText = "1";
                     curType = "all";
                     $http({
                         method:'get',
@@ -300,24 +360,6 @@
                         }
                     )
                 }
-                $scope.searchGeo = function () {
-                    $http({
-                        method: 'post',
-                        url: '/posts/search/' + document.getElementById("typeSearch").value + '/1',
-                        data: {
-                            text: document.getElementById("titleSearch").value,
-                            geoJson : document.getElementById("titleSearch").value
-                        }
-                    }).then(
-                        function success(res) {
-                            if(res.data.result.length !== 0) {
-                                posts = res.data.result;
-                                document.getElementById('clearMarker').click();
-                                document.getElementById('showMarker').click();
-                            }
-                        }
-                    )
-                }
         }])
 
 
@@ -330,7 +372,6 @@
                     url:'/user/logout'
                 }).then(
                     function success() {
-                        loginBtn("show");
                         window.location.href = '';
                     }
                 )
@@ -358,7 +399,7 @@
                                 showLost(res);
                             }
                             else{
-                                alert("没有更多内容了");
+                                alert("没有下一页了！");
                             }
                         }
                     )
@@ -377,7 +418,7 @@
                                 showLost(res);
                             }
                             else{
-                                alert("没有更多内容了");
+                                alert("没有下一页了！");
                             }
                         }
                     )
@@ -397,7 +438,7 @@
                                 showLost(res);
                             }
                             else{
-                                alert("没有更多内容了");
+                                alert("没有下一页了！");
                             }
                         }
                     )
@@ -416,7 +457,7 @@
                                 showLost(res);
                             }
                             else{
-                                alert("没有更多内容了");
+                                alert("没有下一页了！");
                             }
                         }
                     )
@@ -434,6 +475,7 @@
                     position: [coordinate[0],coordinate[1]],
                     map:map
                 });
+                marker.setTitle(posts[index].content);
             }
             coordinate = '';
         }
@@ -444,7 +486,8 @@
             $scope.listMode = function () {
                 clicked('listBtn', 'mapBtn');
                 curMode = "list";
-                document.getElementById('searchAllBtn').click();
+                document.getElementById('lostList').style.display = 'block';
+                document.getElementById('lostPage').style.display = 'block';
                 document.getElementById('lostMap').style.display = 'none';
             }
             $scope.mapMode = function () {
@@ -460,7 +503,6 @@
                 });
                 var clickEventListener = map.on('click', function(e) {
                     document.getElementById("titleSearch").value = e.lnglat.getLng() + ',' + e.lnglat.getLat()
-                    document.getElementById('searchGeo').click();
                 });
                 AMap.event.addDomListener(document.getElementById('showMarker'), 'click', function() {
                     addMarker();
@@ -643,7 +685,6 @@
                             <input id = "titleSearch" type = "text" class = "form-control" title="搜索" value="">
                             <span class = "input-group-btn"><button id = "searchBtn" class = "btn btn-default" type = "button" ng-click="search()">搜索</button></span>
                             <button id = "searchAllBtn" style="display:none;" ng-click="searchAll()"></button>
-                            <button id = 'searchGeo' style="display: none" ng-click="searchGeo()"></button>
                         </div>
                     </div>
                     <button id = "showMarker" style="display: none"></button>

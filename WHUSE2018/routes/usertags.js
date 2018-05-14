@@ -39,7 +39,7 @@ router.post('/:name', isAuthentic, userNameVerify, function (req, res, next) {
 });
 
 //required req.body.deletetags , array of string
-router.delete('/:name', isAuthentic, userNameVerify, function (req, res, next) {
+router.post('/delete/:name', isAuthentic, userNameVerify, function (req, res, next) {
     collection.update({ 'name': req.params.name }, { $pullAll: { tags: req.body.deletetags } }).
         then((result) => {
             if (result.n == 1) return res.send({ 'deleteusertags': '1' });
@@ -63,7 +63,7 @@ router.post('/faculty/add/:name',isAuthentic,userNameVerify,function (req,res,ne
 });
 
 //delete faculty require req.body.deletefaculty array of string
-router.delete('/faculty/:name',isAuthentic,userNameVerify,function (req,res,next) {
+router.post('/faculty/delete/:name',isAuthentic,userNameVerify,function (req,res,next) {
     collection.update({ 'name': req.params.name }, { $pullAll: { 'tags.0': req.body.deletefaculty } }).
     then((result) => {
         if (result.n == 1) return res.send({ 'deleteuserfaculty': '1' });

@@ -1,3 +1,4 @@
+var ObjectId = require('mongodb').ObjectID;
 
 var defaultSegment = require('../Segment/mySegment').defaultSegment;
 var express = require('express');
@@ -100,9 +101,10 @@ router.put('/:postid', isAuthentic, postOwnerVerify, function (req, res, next) {
 
 
 router.delete('/:postid', isAuthentic, postOwnerVerify, function (req, res, next) {
+    console.log(req.params.postid);
     postCollection.remove({ _id: req.params.postid }).then((result) => {
         var username = req.session.passport.user.username;
-        return collection.update({ 'name': username }, { $pull: { postid: req.params.postid } });
+        return collection.update({ 'name': username }, { $pull: { postid: ObjectId(req.params.postid) } });
     }).then((result) => {
         console.log(result);
         if (result.n == 1)
@@ -125,19 +127,21 @@ router.post('/search/:type/:page', function (req, res, next) {
     var page = req.params.page;
     if(!page) page =1;
     var skipNum = (page - 1) * pageLimit;
-    if (skipNum < 0) skipNum = 0;
+
 
     var geoJson = req.body.geoJson;
     var text = req.body.text;
-    if (!text) return res.send({ 'searchpost': '0', message: 'search text cannnot be null' });
-
-    var textParts = defaultSegment(text);
+   /* if (!text) return res.send({ 'searchpost': '0', message: 'search text cannnot be null' });*/
     var query = {
-        'type': type, $or: [
-            { titleIndex: { $in: textParts } },
-            { contentIndex: { $in: textParts } }
-        ]
+        'type': type
     };
+   if(text&&text.length > 0)
+    {
+        var textParts = defaultSegment(text);
+        query['$or'] = [{ titleIndex: { '$in': textParts } },
+                         { contentIndex: { '$in': textParts } }];
+    }
+
 
     if (geoJson)
         query['postinfo.geoJson'] = {
@@ -148,7 +152,13 @@ router.post('/search/:type/:page', function (req, res, next) {
                 }
         };
 
-    postCollection.find(query, { limit: pageLimit, skip: skipNum }).
+    var projectQuery  = { limit: pageLimit, skip: skipNum };
+    if(skipNum<0)
+    {
+        delete projectQuery['limit'];
+        delete projectQuery['skip'];
+    }
+    postCollection.find(query, projectQuery).
         then((result) => {
             res.send({ 'searchpost': '1', 'result': result });
             return;

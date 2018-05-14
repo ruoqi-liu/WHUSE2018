@@ -1,4 +1,3 @@
-
 var express = require('express');
 var session = require('express-session');
 var flash = require('connect-flash');

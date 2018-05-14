@@ -22,6 +22,8 @@
         var posts;
         var username;
 
+        var curId;
+
         $(document).ready(function () {
             username = document.getElementById("username").innerText;
             document.getElementById("showUserTab").click();
@@ -62,12 +64,6 @@
                 }
             )
         });
-        
-        function deleteTags(obj) {
-            var id = event.target.id;
-            id = document.getElementById(id);
-            $(id).remove();
-        }
 
         let show = angular.module('show', []);
         show.controller('showCtrl', ['$scope', '$http',
@@ -131,6 +127,24 @@
                 else {
                     alert("没有下一页了！");
                 }
+            }
+        }])
+
+        let deleteTag = angular.module('deleteTag', []);
+        deleteTag.controller('deleteTagCtrl', ['$scope', '$http',
+            function ($scope, $http) {
+            $scope.deleteTag = function () {
+                curId = event.target.id;
+                $http({
+                    method : 'post',
+                    url : '/usertags/delete/' + username,
+                    data : [curId.innerHTML]
+                }).then(
+                    function success() {
+                        curId = "";
+                        window.location.href = '';
+                    }
+                )
             }
         }])
 
@@ -310,7 +324,7 @@
             }
         }])
 
-        angular.module('userApp', ['date', 'show', 'edit', 'turn', 'deletePost']);
+        angular.module('userApp', ['date', 'show', 'edit', 'turn', 'deletePost', 'deleteTag']);
     </script>
 </head>
 
@@ -572,7 +586,7 @@
 
             <div id = 'tagsPane' class = "tab-pane fade">
                 &nbsp;
-                <div class="row clearfix">
+                <div class="row clearfix" ng-controller="deleteTagCtrl">
                     <div id = "tagsContent">
                         <div id="tags-content-1" style="margin-bottom: 100px">
                         </div>
