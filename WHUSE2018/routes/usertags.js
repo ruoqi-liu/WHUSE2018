@@ -40,7 +40,7 @@ router.post('/:name', isAuthentic, userNameVerify, function (req, res, next) {
 
 //required req.body.deletetags , array of string
 router.delete('/:name', isAuthentic, userNameVerify, function (req, res, next) {
-    collection.update({ 'name': req.params.name }, { $pullAll: { tags: req.body.deletefaculty } }).
+    collection.update({ 'name': req.params.name }, { $pullAll: { tags: req.body.deletetags } }).
         then((result) => {
             if (result.n == 1) return res.send({ 'deleteusertags': '1' });
             res.send({ 'deleteusertags': '0', message: 'delete tags failed' });
